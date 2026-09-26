@@ -217,7 +217,7 @@ Em termos práticos, o estudo pretende mostrar como:
 - Dynamic World V1;
 - MapBiomas Cobertura 10 m;
 - MapBiomas Áreas Estáveis ou estabilidade derivada da série;
-- ano principal 2024;
+- ano principal 2025;
 - região Nordeste do MATOPIBA;
 - agregação temporal Dynamic World;
 - entropia;
@@ -235,7 +235,7 @@ Em termos práticos, o estudo pretende mostrar como:
 - TerraClass como triangulação;
 - margem Top-2;
 - análise por estado;
-- 2025 como pequena sensibilidade.
+- 2024 como pequena sensibilidade.
 
 ## Fora do escopo
 
@@ -280,7 +280,7 @@ Não adicionar novas regiões depois do Dia 2.
 
 ## Ano principal
 
-**2024**
+**2025**
 
 Motivos:
 
@@ -328,7 +328,7 @@ Não baixar o dataset inteiro. Usar diretamente no Google Earth Engine.
 
 ## 10.2 MapBiomas 10 m
 
-Usar a coleção 10 m mais recente e disponível no GEE para 2024.
+Usar a coleção 10 m mais recente e disponível no GEE para 2025.
 
 ### Papel
 
@@ -410,7 +410,7 @@ Cada pixel possui várias observações durante o ano.
 
 O pipeline deve:
 
-1. filtrar 2024;
+1. filtrar 2025;
 2. agregar observações por mês;
 3. gerar uma representação mensal das nove probabilidades;
 4. agregar os meses para evitar que meses com mais cenas tenham peso excessivo;
@@ -822,7 +822,7 @@ Não misturar os dois desenhos.
 
 ```text
 Dynamic World + MapBiomas
-Ano: 2024
+Ano: 2025
 Área: Nordeste do MATOPIBA
 ```
 
@@ -1331,20 +1331,20 @@ Depois de cada etapa:
 
 # 33. Primeiro prompt recomendado para o agente de código
 
-> Você está entrando em um projeto científico GeoAI com prazo extremamente curto. Leia integralmente `PROJECT_BRIEF.md` antes de editar qualquer arquivo. Não altere a pergunta científica, os datasets obrigatórios, o ano de 2024 ou o crosswalk sem aprovação humana.
+> Você está entrando em um projeto científico GeoAI com prazo extremamente curto. Leia integralmente `PROJECT_BRIEF.md` antes de editar qualquer arquivo. Não altere a pergunta científica, os datasets obrigatórios, o ano de 2025 ou o crosswalk sem aprovação humana.
 >
 > Sua primeira tarefa é somente configurar e testar o acesso aos dados.
 >
 > 1. Configure um ambiente Python.
 > 2. Verifique autenticação Google Earth Engine.
 > 3. Carregue `GOOGLE/DYNAMICWORLD/V1`.
-> 4. Identifique e carregue o asset oficial MapBiomas 10 m que contém 2024.
+> 4. Identifique e carregue o asset oficial MapBiomas 10 m que contém 2025.
 > 5. Carregue uma área pequena de teste no MATOPIBA.
 > 6. Gere um script que amostre cerca de 500 pontos e retorne:
 >    - coordenadas;
 >    - as nove probabilidades Dynamic World;
 >    - `label`;
->    - classe MapBiomas 2024.
+>    - classe MapBiomas 2025.
 > 7. Não implemente ainda entropia, bordas, estabilidade ou análise estatística.
 > 8. Salve o resultado em `data/processed/prototype_samples.csv`.
 > 9. Documente exatamente os IDs de assets usados e suas bandas.
