@@ -6,3 +6,5 @@ credentials*
 *.tif
 *.tiff
 data/raw/*
+.agents/
+data/
