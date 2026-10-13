@@ -2,8 +2,8 @@
   "executed": false,
   "approval_required": true,
   "root": ".",
-  "files": 43915,
-  "bytes": 2547269319,
+  "files": 62248,
+  "bytes": 3514584617,
   "groups": {
     ".venv": {
       "files": 42999,
@@ -44,6 +44,12 @@
     "tables_legacy_raw": {
       "files": 44,
       "bytes": 2200248
+    },
+    ".release-work": {
+      "files": 18333,
+      "bytes": 967315298
     }
-  }
+  },
+  "original_files": 43915,
+  "original_bytes": 2547269319
 }

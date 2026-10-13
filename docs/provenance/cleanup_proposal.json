@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-13",
+  "phase": "after scientific push and successful clean clone; before evidence commit",
+  "before_files": 44080,
+  "before_logical_bytes": 2607667917,
+  "current_local_files": 62446,
+  "current_local_logical_bytes": 3721089538,
+  "current_auxiliary_files": 18333,
+  "current_auxiliary_logical_bytes": 967315298,
+  "public_scientific_commit_files": 153,
+  "public_scientific_commit_logical_bytes": 125099784,
+  "original_candidate_files": 43915,
+  "original_candidate_bytes": 2547269319,
+  "new_auxiliary_candidate_directory": ".release-work/",
+  "new_auxiliary_candidate_files": 18333,
+  "new_auxiliary_candidate_bytes": 967315298,
+  "total_proposed_candidate_files": 62248,
+  "total_proposed_candidate_bytes": 3514584617,
+  "deletion_executed": false,
+  "sizes": "logical file lengths; NTFS allocation may differ"
+}

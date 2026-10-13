@@ -68,6 +68,7 @@ docs/*.md
 !docs/release_report.md
 !docs/protocol_amendment_checkpoint_3d.md
 docs/experiment_inventory.csv
+docs/provenance/auxiliary_deletion_candidates.csv
 config/*
 !config/experiment.yaml
 !config/sampling_manifest.yaml

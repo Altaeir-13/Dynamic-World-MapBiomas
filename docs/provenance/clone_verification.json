@@ -1,0 +1,33 @@
+{
+  "repository": "https://github.com/Altaeir-13/Dynamic-World-MapBiomas",
+  "branch": "main",
+  "scientific_commit": "38a3d0cc1aabc98849c7d68e3a1e024842d9aa0f",
+  "clone_source": "GitHub HTTPS, no local copy",
+  "clone_directory": ".release-work/verification-clone",
+  "all_public_files_sha256_equal": 153,
+  "requirements_sha256": "3b2dbf6f16a0a87f8a2af871c2b4a099189667d8a68091a28f31b0c96bc768f1",
+  "verification": {
+    "tables/manuscript_results_manifest.csv": {
+      "verified": 33
+    },
+    "docs/provenance/release_checksums.csv": {
+      "verified": 150
+    },
+    "python_syntax": 20,
+    "development_sources.zip": "CRC OK",
+    "editorial_provenance.zip": "CRC OK",
+    "historical_evidence.zip": "CRC OK",
+    "data": {
+      "annual_rows": 40000,
+      "monthly_rows": 480000,
+      "main_rows": 20000,
+      "municipalities": 337
+    }
+  },
+  "primary_documentation_missing_relative_links": [],
+  "dependency_environment": "new isolated .release-work/install-test created with Python 3.14.5; requirements identical to clone",
+  "pip_check": "passed",
+  "experimental_reexecution": false,
+  "gee_reexecution": false,
+  "cloned_requirements_install_dry_run": "passed using the new isolated environment; no index, direct and transitive requirements satisfied"
+}

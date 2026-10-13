@@ -6,8 +6,8 @@
   "archive_members_verified_against_original_sha256": 196,
   "credential_scan_suspects": [],
   "largest_public_file_bytes": 34847652,
-  "public_files_before_report_completion": 153,
-  "public_logical_bytes_before_report_completion": 125099036,
+  "public_files_before_report_completion": 155,
+  "public_logical_bytes_before_report_completion": 130200562,
   "clean_dependency_install": true,
   "pip_check": "No broken requirements found",
   "experimental_rerun": false,
@@ -18,7 +18,7 @@
       "verified": 33
     },
     "docs/provenance/release_checksums.csv": {
-      "verified": 150
+      "verified": 151
     },
     "python_syntax": 20,
     "development_sources.zip": "CRC OK",
