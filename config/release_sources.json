@@ -1,0 +1,9 @@
+{
+  "gee": [
+    "01_check_access.py", "02_boundary.py", "dw_annual.py",
+    "submit_canonical_batch_exports.py", "monitor_and_process_batches.py",
+    "14_regenerate_master_sample.py", "11_extract_analytical_dataset.py",
+    "12_extract_harmonized_bilinear_monthly.py", "16_dw_partition_invariance_audit.py",
+    "17_test_domain_convergence.py", "20_test_pagination_invariance.py"
+  ]
+}

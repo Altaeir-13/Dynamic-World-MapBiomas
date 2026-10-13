@@ -1,0 +1,9 @@
+metric,value_ha,description
+boundary_vector_area_geodesic_ha,73082921.02323268,Área geodésica exata do polígono vetorial MATOPIBA (elipsoide WGS84)
+boundary_vector_area_epsg5880_ha,73777179.27010548,Área projetada do polígono vetorial MATOPIBA em EPSG:5880 (SIRGAS 2000)
+mapbiomas_raster_covered_area_ha,73082920.6790083,Área física das células 10m MapBiomas com dado não-nulo dentro do domínio
+difference_boundary_geodesic_vs_raster_ha,0.34422437846660614,Diferença boundary geodésico vs cobertura raster MapBiomas
+difference_boundary_geodesic_vs_raster_pct,4.7100522755128925e-07,Percentual de diferença boundary geodésico vs cobertura raster
+difference_boundary_5880_vs_raster_ha,694258.5910971761,Diferença boundary EPSG:5880 vs cobertura raster MapBiomas
+difference_boundary_5880_vs_raster_pct,0.941020784429054,Percentual de diferença boundary EPSG:5880 vs cobertura raster
+raster_uncovered_or_center_rule_area_ha,0.34422437846660614,Área não coberta por raster devido à regra do centróide de pixel na borda

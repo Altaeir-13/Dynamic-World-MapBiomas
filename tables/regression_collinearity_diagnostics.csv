@@ -1,0 +1,5 @@
+predictor,VIF
+entropy_annual,1.4340388368617885
+jsd_temporal,1.4158730320692412
+stability,1.7570000983819063
+distance_edge_min_m,1.0027639951208203

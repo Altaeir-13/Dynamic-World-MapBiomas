@@ -1,0 +1,135 @@
+experiment:
+  name: Dynamic World x MapBiomas — MATOPIBA 2025
+  year: 2025
+  random_seed: 25
+  created: '2026-09-27T01:29:39.520678+00:00'
+  status: CHECKPOINT_1_PROTOTYPE_AUDITED_AND_REVISED
+study_area:
+  name: MATOPIBA
+  boundary_file: data/reference/matopiba_boundary.geojson
+  municipalities_file: data/reference/matopiba_municipalities.csv
+  boundary_sha256: 716df1361fee63c453ef96e7a59c92b3317175ed98e83d1cb053b37e3b3c20c8
+  source: IBGE - Estrutura Territorial MATOPIBA 2021 (MATOPIBA_2021.xls) + IBGE Malhas
+    Municipais 2025 via Servico de Dados (qualidade maxima, data=2025)
+  definition: delimitação operacional do MATOPIBA reconstruída a partir da lista oficial
+    de 337 municípios e da malha municipal IBGE 2025
+  n_municipalities: 337
+  area_ha_epsg5880: 73777179.27
+  area_ha_geodesic_wgs84: 73082921.02
+  area_ha_raster_census: 73057911.87
+  states:
+  - MA
+  - TO
+  - PI
+  - BA
+products:
+  dynamic_world:
+    asset: GOOGLE/DYNAMICWORLD/V1
+    start_date: '2025-01-01'
+    end_date_exclusive: '2026-01-01'
+    probability_bands:
+    - water
+    - trees
+    - grass
+    - flooded_vegetation
+    - crops
+    - shrub_and_scrub
+    - built
+    - bare
+    - snow_and_ice
+    label_band: label
+  mapbiomas:
+    asset: projects/mapbiomas-public/assets/brazil/lulc_10m/collection4/mapbiomas_10m_collection4_coverage_v1
+    band: classification_2025
+    collection: Cobertura 10m Collection 4
+    crs: EPSG:4326
+    crs_transform:
+    - 8.983152841195215e-05
+    - 0
+    - -75.62655865569857
+    - 0
+    - -8.983152841195215e-05
+    - 6.763595437192701
+    nominal_scale_m: 10
+crosswalk:
+  principal:
+    crop_codes:
+    - 19
+    - 36
+    crop_code_names:
+      19: Lavoura Temporaria
+      36: Lavoura Perene
+    excluded_codes:
+    - 21
+    - 18
+    excluded_code_names:
+      21: Mosaico de Usos
+      18: Agricultura (caso ocorra)
+  sensitivity_strict:
+    crop_codes:
+    - 19
+    crop_code_names:
+      19: Lavoura Temporaria
+spatial:
+  primary_support_m: 10
+  sensitivity_support_m: 30
+  distance_crs: EPSG:5880
+  grid_reference: MapBiomas classification_2025
+  dw_resampling: bilinear (probabilidades continuas)
+  mb_resampling: nearest neighbor (categorico)
+  spatial_aggregation_30m:
+    dynamic_world: reduceResolution(mean) a partir da grade 10m
+    mapbiomas: reduceResolution(mode/majority) sobre binario com excluded mascarados
+    grid_30m: derivada exatamente da grade 10m com transform dx*3, dy*3 e mesma origem
+temporal:
+  primary_min_valid_months: 8
+  fallback_min_valid_months: 6
+  daily_composition: neutral_mean_of_same_day_duplicates
+  monthly_composition: mean_of_valid_daily_composites
+  annual_composition: equal_weight_mean_of_valid_months
+  class_derivation: argmax_of_probability_vector
+  missing_months: no_imputation
+  per_point_accounting: contagem exata de observacoes unmasked por mes (n_obs_m01..m12)
+sampling:
+  design: stratified_random_without_replacement
+  strata: state_x_agreement_regime
+  main_n: 20000
+  robust_n: 40000
+  min_per_active_stratum_main: 400
+  seed: 25
+edges:
+  max_distance_m: 250
+  connectivity: 8
+  sources:
+  - MapBiomas
+  - Dynamic World
+  metrics:
+  - distance_edge_mb_m
+  - distance_edge_dw_m
+  - distance_edge_min_m
+  excluded_masking: classes 21 e 18 mascaradas antes do calculo da borda
+  algorithm: fastDistanceTransform direto sobre edge=1 (sem edge.Not())
+probability_normalization:
+  method: renormalizacao_neutra p'_k = p_k / sum(p)
+  raw_sum_preserved: probability_sum_before_normalization mantido para auditoria
+  scientific_metrics: entropia, top2_margin, competitor_class e dw_annual_class baseados
+    no vetor unitario
+inference:
+  bootstrap_replicates: 1999
+  bootstrap_seed: 25
+  block_size: to_be_determined_from_semivariogram
+stability_sensitivity:
+  years_available:
+  - 2017
+  - 2018
+  - 2019
+  - 2020
+  - 2021
+  - 2022
+  - 2023
+  - 2024
+  - 2025
+  feasible: true
+software:
+  python: 3.14.5
+  earthengine_api: 1.7.45

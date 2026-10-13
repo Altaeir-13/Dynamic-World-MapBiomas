@@ -1,0 +1,56 @@
+release:
+  date: '2026-10-13'
+  state: FROZEN_CORRECTED_RESULTS
+  year: 2025
+  results_recomputed_during_organization: false
+  authoritative_manuscript: paper/manuscript_space_week_nordeste_2026_final_title_references.docx
+  scientific_manifest: tables/manuscript_results_manifest.csv
+  release_manifest: docs/provenance/release_checksums.csv
+  snapshots_preserved:
+    - PROJECT_BRIEF.md
+    - config/experiment.yaml
+    - config/sampling_manifest.yaml
+study:
+  municipalities: 337
+  states: [MA, TO, PI, BA]
+  source_support_buffer_m: 5000
+  map_grid_crs: EPSG:4326
+  map_grid_nominal_m: 10
+  map_grid_transform: [8.983152841195215e-05, 0, -75.62655865569857, 0, -8.983152841195215e-05, 6.763595437192701]
+  metric_crs: EPSG:5880
+  dynamic_world_asset: GOOGLE/DYNAMICWORLD/V1
+  mapbiomas_asset: projects/mapbiomas-public/assets/brazil/lulc_10m/collection4/mapbiomas_10m_collection4_coverage_v1
+  mapbiomas_band: classification_2025
+  period: ['2025-01-01', '2026-01-01']
+  crop_codes: [19, 36]
+  excluded_codes: [18, 21]
+  min_valid_months: 8
+  seed: 25
+  main_n: 20000
+  master_n: 40000
+  scientific_strata: 16
+  active_operational_substrata: 410
+  sampled_slices: 182
+  distance_truncation_m: 250
+inference:
+  primary_distance: linear
+  primary_weight: inverse_inclusion_probability_normalized_by_mean
+  bootstrap_block_km: 30
+  bootstrap_replicates: 1999
+  bootstrap_seed: 25
+  bootstrap_ci: percentile_2.5_97.5
+  block_sensitivity_km: [10, 20, 40]
+  h4_quartiles: separately_weighted_within_main_and_master_samples
+temporal_correction:
+  script: src/gee/12_extract_harmonized_bilinear_monthly.py
+  month_valid: n_valid_days > 0 and probability_sum_before_normalization > 0.01
+  jsd: entropy_of_harmonized_monthly_mean_minus_mean_monthly_entropy
+  stability_reference: canonical_annual_class
+  annual_monthly_identity: not_assumed
+limitations:
+  independent_field_truth: absent
+  complete_30m_results: not_identified
+  end_to_end_gee_rerun_during_release: not_performed
+  bitwise_future_catalog_reproduction: not_guaranteed
+# This is a reconciled descriptive record. Existing scripts do not automatically
+# consume all values in this YAML; see docs/architecture.md.

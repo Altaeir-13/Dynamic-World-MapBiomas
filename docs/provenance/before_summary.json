@@ -1,0 +1,78 @@
+{
+  "files": 44080,
+  "bytes": 2607667917,
+  "groups": {
+    ".agents": {
+      "files": 3,
+      "bytes": 15406
+    },
+    ".git": {
+      "files": 48,
+      "bytes": 85069
+    },
+    ".gitignore": {
+      "files": 1,
+      "bytes": 100
+    },
+    ".venv": {
+      "files": 42999,
+      "bytes": 1219960848
+    },
+    "config": {
+      "files": 3,
+      "bytes": 20596
+    },
+    "data": {
+      "files": 613,
+      "bytes": 1323427487
+    },
+    "docs": {
+      "files": 15,
+      "bytes": 231717
+    },
+    "figures": {
+      "files": 6,
+      "bytes": 1737986
+    },
+    "figures_legacy_raw": {
+      "files": 6,
+      "bytes": 1800760
+    },
+    "instrucoes2_autores_swn_2026.pdf": {
+      "files": 1,
+      "bytes": 135486
+    },
+    "normas_trabalhos_cientificos_swn_2026.pdf": {
+      "files": 1,
+      "bytes": 211774
+    },
+    "paper": {
+      "files": 88,
+      "bytes": 22645180
+    },
+    "PROJECT_BRIEF.md": {
+      "files": 1,
+      "bytes": 49137
+    },
+    "requirements.txt": {
+      "files": 1,
+      "bytes": 6924
+    },
+    "scratch": {
+      "files": 123,
+      "bytes": 32269924
+    },
+    "src": {
+      "files": 83,
+      "bytes": 668300
+    },
+    "tables": {
+      "files": 44,
+      "bytes": 2200975
+    },
+    "tables_legacy_raw": {
+      "files": 44,
+      "bytes": 2200248
+    }
+  }
+}

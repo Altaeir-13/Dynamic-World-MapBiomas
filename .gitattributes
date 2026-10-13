@@ -1,0 +1,2 @@
+# Preserve the exact bytes of frozen tables, manifests and scientific artifacts.
+* -text

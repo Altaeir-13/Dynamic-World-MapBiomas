@@ -1,0 +1,248 @@
+manifest_version: 1.1.0
+timestamp_utc: '2026-09-29T14:53:43.228301+00:00'
+status: FROZEN_AUTHORIZED
+checkpoint: CHECKPOINT_3B
+description: Manifesto oficial e congelado de amostragem probabilística do estudo
+  Dynamic World x MapBiomas no MATOPIBA 2025 com cobertura de 100% da população-alvo
+  (zero pi=0).
+domain:
+  name: MATOPIBA
+  boundary_file: data/reference/matopiba_boundary.geojson
+  boundary_sha256: 716df1361fee63c453ef96e7a59c92b3317175ed98e83d1cb053b37e3b3c20c8
+  municipalities_file: data/reference/matopiba_municipalities.csv
+  municipalities_sha256: a6adf8e6d2500be1ab788f2128b7db263260455db95bea0d9e3ca173ef3266ca
+  n_municipalities: 337
+  states:
+  - MA
+  - TO
+  - PI
+  - BA
+  boundary_area_ha:
+    boundary_vector_area_geodesic_ha: 73082921.02323268
+    boundary_vector_area_epsg5880_ha: 73777179.27010548
+    mapbiomas_raster_covered_area_ha: 73082920.6790083
+    difference_geodesic_vs_raster_ha: 0.3442243784666061
+    difference_geodesic_vs_raster_pct: 4.710052275512893e-07
+    raster_uncovered_or_center_rule_area_ha: 0.3442243784666061
+grid_and_projection:
+  crs: EPSG:4326
+  crsTransform:
+  - 8.983152841195215e-05
+  - 0.0
+  - -75.62655865569857
+  - 0.0
+  - -8.983152841195215e-05
+  - 6.763595437192701
+  nominal_resolution_m: 10.0
+  metric_projected_crs: EPSG:5880
+  pixel_area_source: ee.Image.pixelArea()
+official_assets:
+  dynamic_world:
+    collection: GOOGLE/DYNAMICWORLD/V1
+    period:
+      start: '2025-01-01'
+      end: '2026-01-01'
+    bands:
+    - water
+    - trees
+    - grass
+    - flooded_vegetation
+    - crops
+    - shrub_and_scrub
+    - built
+    - bare
+    - snow_and_ice
+    crops_index: 4
+  mapbiomas:
+    asset: projects/mapbiomas-public/assets/brazil/lulc_10m/collection4/mapbiomas_10m_collection4_coverage_v1
+    band: classification_2025
+    historical_series_asset: projects/mapbiomas-public/assets/brazil/lulc_10m/collection4/mapbiomas_10m_collection4_coverage_v1
+    historical_years:
+    - 2017
+    - 2018
+    - 2019
+    - 2020
+    - 2021
+    - 2022
+    - 2023
+    - 2024
+    - 2025
+frozen_crosswalk:
+  mapbiomas:
+    crop:
+    - 19
+    - 36
+    excluded:
+    - 18
+    - 21
+    noncrop: todas as demais classes validas (inclui 15 pastagem, 9 silvicultura)
+  dynamic_world:
+    crop: annual_class_index == 4 ('crops')
+    noncrop: annual_class_index != 4
+  temporal_eligibility:
+    metric: n_valid_months
+    threshold: '>= 8'
+    total_months: 12
+  regimes:
+    AA: MapBiomas Crop (1) AND Dynamic World Crop (1)
+    AN: MapBiomas Crop (1) AND Dynamic World Noncrop (0)
+    NA: MapBiomas Noncrop (0) AND Dynamic World Crop (1)
+    NN: MapBiomas Noncrop (0) AND Dynamic World Noncrop (0)
+sampling_design:
+  root_seed: 25
+  strata_count: 16
+  operational_slices_count: 183
+  slice_counts_by_state:
+    MA: 63
+    TO: 66
+    PI: 23
+    BA: 31
+  total_target_sample_size_robust: 40000
+  total_target_sample_size_main: 20000
+  scientific_allocation_rule: Hamilton Largest Remainder com piso min_stratum=400
+    na amostra main, robust = 2 * main
+  operational_allocation_rule: Hamilton Largest Remainder com garantia n_robust_hs
+    >= 1 para todo subestrato com N_hs_exact > 0
+  strata_definitions:
+  - stratum_id: MA_AA
+    state: MA
+    regime: AA
+    A_h_ha: 20401.22223808244
+    N_h_exact: 2070187
+    n_main: 405
+    n_robust: 810
+  - stratum_id: MA_AN
+    state: MA
+    regime: AN
+    A_h_ha: 954536.1341078944
+    N_h_exact: 96935469
+    n_main: 648
+    n_robust: 1296
+  - stratum_id: MA_NA
+    state: MA
+    regime: NA
+    A_h_ha: 139513.6403617654
+    N_h_exact: 14154617
+    n_main: 436
+    n_robust: 872
+  - stratum_id: MA_NN
+    state: MA
+    regime: NN
+    A_h_ha: 8848921.447126616
+    N_h_exact: 896751404
+    n_main: 2699
+    n_robust: 5398
+  - stratum_id: TO_AA
+    state: TO
+    regime: AA
+    A_h_ha: 32722.884248024784
+    N_h_exact: 3347522
+    n_main: 409
+    n_robust: 818
+  - stratum_id: TO_AN
+    state: TO
+    regime: AN
+    A_h_ha: 1238902.377903672
+    N_h_exact: 126787963
+    n_main: 722
+    n_robust: 1444
+  - stratum_id: TO_NA
+    state: TO
+    regime: NA
+    A_h_ha: 80025.79078422207
+    N_h_exact: 8214396
+    n_main: 421
+    n_robust: 842
+  - stratum_id: TO_NN
+    state: TO
+    regime: NN
+    A_h_ha: 21310548.416554023
+    N_h_exact: 2182208560
+    n_main: 5937
+    n_robust: 11874
+  - stratum_id: PI_AA
+    state: PI
+    regime: AA
+    A_h_ha: 330559.1447646292
+    N_h_exact: 33598928
+    n_main: 486
+    n_robust: 972
+  - stratum_id: PI_AN
+    state: PI
+    regime: AN
+    A_h_ha: 927374.18291332
+    N_h_exact: 94434411
+    n_main: 641
+    n_robust: 1282
+  - stratum_id: PI_NA
+    state: PI
+    regime: NA
+    A_h_ha: 818957.6512791552
+    N_h_exact: 83293575
+    n_main: 613
+    n_robust: 1226
+  - stratum_id: PI_NN
+    state: PI
+    regime: NN
+    A_h_ha: 5441631.502764557
+    N_h_exact: 554809243
+    n_main: 1814
+    n_robust: 3628
+  - stratum_id: BA_AA
+    state: BA
+    regime: AA
+    A_h_ha: 1160151.3511858508
+    N_h_exact: 119379950
+    n_main: 701
+    n_robust: 1402
+  - stratum_id: BA_AN
+    state: BA
+    regime: AN
+    A_h_ha: 1653722.792856224
+    N_h_exact: 170647372
+    n_main: 830
+    n_robust: 1660
+  - stratum_id: BA_NA
+    state: BA
+    regime: NA
+    A_h_ha: 1921503.4343066048
+    N_h_exact: 198341857
+    n_main: 899
+    n_robust: 1798
+  - stratum_id: BA_NN
+    state: BA
+    regime: NN
+    A_h_ha: 7462644.08800376
+    N_h_exact: 769694100
+    n_main: 2339
+    n_robust: 4678
+  operational_slice_sampling:
+    method: Stratified sampling por fatia operacional (state x regime x slice_id)
+    zero_pi_guarantee: pi_robust_hs > 0 para 100% dos pixels da populacao-alvo
+    inclusion_probability_robust_formula: pi_robust_hs = n_robust_hs / N_hs_exact
+    design_weight_robust_formula: w_design_robust = 1 / pi_robust_hs
+    area_weight_robust_formula: w_area_robust = pixel_area_m2 / pi_robust_hs
+    main_subsampling_rule: 'Deterministic SHA256 ranking: SHA256(root_seed=25 | ''main_rank''
+      | state | regime | lon | lat)'
+    main_selection_probability_formula: pi_main_i = pi_robust_hs * (n_main_h / n_robust_h)
+      = 0.5 * pi_robust_hs
+    design_weight_main_formula: w_design_main = 1 / pi_main_i = 2 * w_design_robust
+    area_weight_main_formula: w_area_main = pixel_area_m2 / pi_main_i = 2 * w_area_robust
+      (somente para main_sample == 1, NaN para outros)
+frozen_artifacts_sha256:
+  data/reference/matopiba_boundary.geojson: 716df1361fee63c453ef96e7a59c92b3317175ed98e83d1cb053b37e3b3c20c8
+  data/reference/matopiba_municipalities.csv: a6adf8e6d2500be1ab788f2128b7db263260455db95bea0d9e3ca173ef3266ca
+  data/reference/matopiba_states.geojson: 68c75dcb99ca2b06a30e98324b5c9427729d9c58efb2c7ea858eb67356cf81ca
+  config/experiment.yaml: 4c5c7bdd6d9eba38050cac8810cbf26244c5573da2d9ca3fb372d194ef43a3bb
+  data/processed/wall_to_wall_summary.csv: 4541d8d6814ff06962028b49abb096ae197f086f2f3ac4f90394f649c6ec9aa5
+  data/processed/wall_to_wall_summary_10m_AUDIT.csv: 4541d8d6814ff06962028b49abb096ae197f086f2f3ac4f90394f649c6ec9aa5
+  tables/sampling_frame_10m.csv: 75e2227a3105d348267b3dea1c15c31f694c8b26c43bd06a591e4e2bbb853cf9
+  tables/sampling_quotas.csv: 72b7c166c9068628cd05bfbad139b34ff953d6607d1d1a444f124eb007965cac
+  tables/slice_sampling_allocation_final.csv: 6fd52a82e242ad1d318f482113b9647997f588563aeedf64061e2f1d0975c2dd
+  tables/zero_inclusion_substrata_audit.csv: c31be9716d4eb5e97767c6582025a3da5271330842e6ad9fb4e1d959f112b8ca
+  tables/dw_annual_identity_diagnostic.csv: bdea5a72c976d9a66600152f1db0e8e6401ee9174e01e2c4efff1d7e74b2e130
+  tables/boundary_vs_raster_area_comparison.csv: d345668920c354388e22af60b7b43dfecb13670aff5e8a978abb452579630456
+  data/processed/master_sampling_points.csv: 0b2af407eca5e7fcf5ffdaf25853ba6ca90bc42022c1c977ffc79c591e49621e
+  data/processed/dw_monthly.parquet: 28aaad663029cf191b13fc74cc55daed80ecc34a40e88be373449f31a65f74bf
+  data/processed/samples_annual.parquet: fc662a45b288a54cf32ed78efdac4634eac7210dc98418f2898c26eb8bbefa46
+  data/processed/samples_annual.csv: d9b0655250b64e7bc04a8373f3e43f6992251a719da0b0775b417c4b9ed23b9e

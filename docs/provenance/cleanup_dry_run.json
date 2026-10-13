@@ -1,0 +1,49 @@
+{
+  "executed": false,
+  "approval_required": true,
+  "root": ".",
+  "files": 43915,
+  "bytes": 2547269319,
+  "groups": {
+    ".venv": {
+      "files": 42999,
+      "bytes": 1219960848
+    },
+    "config": {
+      "files": 1,
+      "bytes": 8272
+    },
+    "data": {
+      "files": 580,
+      "bytes": 1268264185
+    },
+    "docs": {
+      "files": 14,
+      "bytes": 228225
+    },
+    "figures_legacy_raw": {
+      "files": 6,
+      "bytes": 1800760
+    },
+    "paper": {
+      "files": 78,
+      "bytes": 22030866
+    },
+    "scratch": {
+      "files": 123,
+      "bytes": 32269924
+    },
+    "src": {
+      "files": 65,
+      "bytes": 435386
+    },
+    "tables": {
+      "files": 5,
+      "bytes": 70605
+    },
+    "tables_legacy_raw": {
+      "files": 44,
+      "bytes": 2200248
+    }
+  }
+}

@@ -1,0 +1,7 @@
+model_name,formula,aic,deviance,log_likelihood,pseudo_r2_mcfadden
+M0_Univariado_H,D ~ entropy_annual,16180.01844804207,16176.01844804207,-8088.009224021035,0.015189604747873786
+M0_Univariado_JSD,D ~ jsd_temporal,16172.059356900096,16168.0593569001,-8084.029678450048,0.015674161297963618
+M0_Univariado_S,D ~ stability,16028.33349602645,16024.33349602645,-8012.166748013225,0.024424319583797205
+M0_Univariado_Dist,D ~ distance_edge_min_m,15771.51573786831,15767.51573786831,-7883.757868934155,0.04005961319649043
+M1_Primario_DistLinear,"D ~ entropy_annual + jsd_temporal + stability + distance_edge_min_m + C(state, Treatment(reference='BA'))",14193.97926769533,14177.97926769533,-7088.989633847665,0.13683200774381477
+M2_Alternativo_LogDist,"D ~ entropy_annual + jsd_temporal + stability + log_dist + C(state, Treatment(reference='BA'))",14472.946225921834,14456.946225921834,-7228.473112960917,0.11984825112436182

@@ -1,0 +1,2470 @@
+[
+  {
+    "path": "paper/audit_final_review.py",
+    "docstring": "Read-only scientific cross-checks and document QA; writes only paper/ QA.\n\nNo Earth Engine, sampling, model fitting, or bootstrap execution. The monthly\ncache check compares already materialized vectors; it does not generate data.",
+    "imports": [
+      "pathlib",
+      "sys",
+      "csv",
+      "json",
+      "hashlib",
+      "re",
+      "collections",
+      "docx",
+      "docx.oxml.ns",
+      "pypdf",
+      "pdfplumber",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "ROOT=Path(__file__).resolve().parent.parent",
+      "manifest=list(csv.DictReader((ROOT/'tables/manuscript_results_manifest.csv').open(encoding='utf-8-sig')))",
+      "before=json.loads((QA/'protected_before.json').read_text(encoding='utf-8'))",
+      "data=pd.read_csv(ROOT/'data/processed/samples_annual.csv',keep_default_na=False,usecols=cols+['p_'+b for b in bands])",
+      "for path in sorted(cached.glob('*.json')):",
+      "(QA/'final_audit.json').write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')"
+    ]
+  },
+  {
+    "path": "paper/build_author_review.py",
+    "docstring": "Edit the existing final_review DOCX; do not read or run scientific code.\n\nPreserves every scientific paragraph, table, image, and reference verbatim.\nWrites only author_review files and QA in paper/. PDF comes from this DOCX.",
+    "imports": [
+      "pathlib",
+      "copy",
+      "os",
+      "sys",
+      "json",
+      "re",
+      "hashlib",
+      "subprocess",
+      "shutil",
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.oxml",
+      "docx.oxml.ns"
+    ],
+    "io_lines": [
+      "import os, sys, json, re, hashlib, subprocess, shutil",
+      "ROOT=Path(__file__).resolve().parent.parent",
+      "checks=json.loads((PAPER/'qa_author_review/build_checks.json').read_text(encoding='utf-8'))",
+      "(QA/'build_checks.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2),encoding='utf-8')",
+      "(QA/'source_hashes.json').write_text(json.dumps(before,indent=2),encoding='utf-8')",
+      "(QA/'build_checks.json').write_text(json.dumps({'scientific_body_and_table_values_verbatim':True,'caption_changes':caption_changes,'paragraph_repositioned':'Census explanation moved immediately after Table 1','scientific_image_bytes_unchanged':True,'preserved_source_files':before,'author':AUTHOR,'email':EMAIL,'name_and_email_require_confirmation':True},ensure_ascii=False,indent=2),encoding='utf-8')",
+      "subprocess.run([str(RUNTIME/'python/python.exe'),str(SKILL/'render_docx.py'),str(PAPER/(STEM+'.docx')),'--output_dir',str(QA/'render'),'--emit_pdf','--verbose'],check=True,env=env)"
+    ]
+  },
+  {
+    "path": "paper/build_final_review.py",
+    "docstring": "Editorial build only. Reads frozen CSVs; never runs experimental code.\n\nUse the bundled Codex Python runtime. DOCX is the editable master; the PDF is\nexported by render_docx.py with native LibreOffice on Windows.",
+    "imports": [
+      "pathlib",
+      "csv",
+      "hashlib",
+      "json",
+      "re",
+      "shutil",
+      "subprocess",
+      "os",
+      "sys",
+      "collections",
+      "docx",
+      "docx.shared",
+      "docx.enum.section",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "docx.opc.constants",
+      "PIL"
+    ],
+    "io_lines": [
+      "import csv, hashlib, json, re, shutil, subprocess, os, sys",
+      "ROOT = Path(__file__).resolve().parent.parent",
+      "target=QA/'protected_before.json'",
+      "files.extend(p for p in PAPER.glob('*') if p.is_file() and 'final' not in p.name and p.name != Path(__file__).name)",
+      "return ImageFont.truetype(str(Path('C:/Windows/Fonts')/('timesbd.ttf' if bold else 'times.ttf')),round(10*300/72))",
+      "rp=rows('descriptive_regime_proportions.csv')[:4]",
+      "sp={r['state']:float(r['pct_within_state']) for r in rows('descriptive_state_proportions.csv') if r['regime']=='Total Discordância'}",
+      "hb=rows('hypothesis_h3_distance_bins.csv'); sb=rows('spatial_bootstrap_distance_bins.csv')",
+      "frame=rows('sampling_frame_10m.csv');totalA=sum(float(x['A_hs']) for x in frame);totalN=sum(int(x['N_hs_exact']) for x in frame)",
+      "rp={r['regime']:r for r in rows('descriptive_regime_proportions.csv')}",
+      "sp={r['state']:r for r in rows('descriptive_state_proportions.csv') if r['regime']=='Total Discordância'}",
+      "hc=rows('hypothesis_h1_results.csv')+rows('hypothesis_h2_results.csv');bc=rows('spatial_bootstrap_contrasts.csv')",
+      "rg={r['term']:r for r in rows('regression_logistic_rescaled_odds_ratios.csv')}",
+      "subprocess.run([str(RUNTIME/'python/python.exe'),str(SKILL/'render_docx.py'),str(PAPER/(STEM+'.docx')),'--output_dir',str(QA/'final_docx'),'--emit_pdf','--verbose'],check=True,env=env)"
+    ]
+  },
+  {
+    "path": "paper/build_final_title_references.py",
+    "docstring": "Targeted title/citation edits to the geometry-approved editable master.\nNo experiments, model fitting, data generation or dataset modifications.",
+    "imports": [
+      "pathlib",
+      "collections",
+      "sys",
+      "re",
+      "json",
+      "hashlib",
+      "shutil",
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "build_author_review",
+      "docx.oxml.ns",
+      "docx.oxml.ns"
+    ],
+    "io_lines": [
+      "PAPER=Path(__file__).resolve().parent",
+      "(QA/'build_checks.json').write_text(json.dumps(checks,ensure_ascii=False,indent=2),encoding='utf-8')"
+    ]
+  },
+  {
+    "path": "paper/qa_geometry_review/previous_build_author_review.py",
+    "docstring": "Edit the existing final_review DOCX; do not read or run scientific code.\n\nPreserves every scientific paragraph, table, image, and reference verbatim.\nWrites only author_review files and QA in paper/. PDF comes from this DOCX.",
+    "imports": [
+      "pathlib",
+      "copy",
+      "os",
+      "sys",
+      "json",
+      "re",
+      "hashlib",
+      "subprocess",
+      "shutil",
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.oxml",
+      "docx.oxml.ns"
+    ],
+    "io_lines": [
+      "import os, sys, json, re, hashlib, subprocess, shutil",
+      "ROOT=Path(__file__).resolve().parent.parent",
+      "(QA/'source_hashes.json').write_text(json.dumps(before,indent=2),encoding='utf-8')",
+      "(QA/'build_checks.json').write_text(json.dumps({'scientific_body_and_table_values_verbatim':True,'caption_changes':caption_changes,'paragraph_repositioned':'Census explanation moved immediately after Table 1','scientific_image_bytes_unchanged':True,'preserved_source_files':before,'author':AUTHOR,'email':EMAIL,'name_and_email_require_confirmation':True},ensure_ascii=False,indent=2),encoding='utf-8')",
+      "subprocess.run([str(RUNTIME/'python/python.exe'),str(SKILL/'render_docx.py'),str(PAPER/(STEM+'.docx')),'--output_dir',str(QA/'render'),'--emit_pdf','--verbose'],check=True,env=env)"
+    ]
+  },
+  {
+    "path": "paper/qa_geometry_review/previous_verify_author_review.py",
+    "docstring": "Document-only QA. Does not read datasets or run scientific analyses.",
+    "imports": [
+      "pathlib",
+      "sys",
+      "re",
+      "json",
+      "hashlib",
+      "zipfile",
+      "collections",
+      "docx",
+      "docx.oxml.ns",
+      "pypdf",
+      "pdfplumber"
+    ],
+    "io_lines": [
+      "PAPER=Path(__file__).resolve().parent",
+      "checks=json.loads((QA/'build_checks.json').read_text(encoding='utf-8'))",
+      "(QA/'document_checks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')"
+    ]
+  },
+  {
+    "path": "paper/verify_author_review.py",
+    "docstring": "Document-only QA. Does not read datasets or run scientific analyses.",
+    "imports": [
+      "pathlib",
+      "sys",
+      "re",
+      "json",
+      "hashlib",
+      "zipfile",
+      "collections",
+      "docx",
+      "docx.oxml.ns",
+      "pypdf",
+      "pdfplumber"
+    ],
+    "io_lines": [
+      "PAPER=Path(__file__).resolve().parent",
+      "checks=json.loads((QA/'build_checks.json').read_text(encoding='utf-8'))",
+      "(QA/'document_checks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')"
+    ]
+  },
+  {
+    "path": "paper/verify_final_title_references.py",
+    "docstring": "Document-only QA. Does not read datasets or run scientific analyses.",
+    "imports": [
+      "pathlib",
+      "sys",
+      "re",
+      "json",
+      "hashlib",
+      "zipfile",
+      "collections",
+      "docx",
+      "docx.oxml.ns",
+      "docx.enum.text",
+      "pypdf",
+      "pdfplumber"
+    ],
+    "io_lines": [
+      "PAPER=Path(__file__).resolve().parent",
+      "checks=json.loads((QA/'build_checks.json').read_text(encoding='utf-8'))",
+      "(QA/'document_checks.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')",
+      "(QA/'citations_bidirectional.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')"
+    ]
+  },
+  {
+    "path": "scratch/audit_annual_vs_monthly_identity_40k.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/audit_etapa1_sampling_weights.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_main_pts = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_alloc = pd.read_csv('tables/slice_sampling_allocation_final.csv')",
+      "df_quotas = pd.read_csv('tables/sampling_quotas.csv')",
+      "df_w2w = pd.read_csv('data/processed/wall_to_wall_summary.csv')",
+      "df_frame = pd.read_csv('tables/sampling_frame_10m.csv')"
+    ]
+  },
+  {
+    "path": "scratch/audit_etapa3_bootstrap.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy",
+      "pyproj"
+    ],
+    "io_lines": [
+      "df = pd.read_parquet('data/processed/samples_annual.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/audit_etapa4_stability_diagnostic.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')",
+      "merged.to_parquet('scratch/diagnostic_stability_merged.parquet', index=False)",
+      "print(\"\\nSalvo scratch/diagnostic_stability_merged.parquet\")"
+    ]
+  },
+  {
+    "path": "scratch/audit_etapa5_h3_h4.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/audit_etapa6_territorial.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_w2w = pd.read_csv('data/processed/wall_to_wall_summary.csv')",
+      "# Columns in wall_to_wall_summary.csv:",
+      "# Also check monthly valid coverage distribution across MATOPIBA from tables/dw_valid_months_area.csv",
+      "df_vm = pd.read_csv('tables/dw_valid_months_area.csv')"
+    ]
+  },
+  {
+    "path": "scratch/build_v3_1_definitive.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "subprocess",
+      "pypdf",
+      "os",
+      "pypdfium2"
+    ],
+    "io_lines": [
+      "import subprocess, pypdf, os",
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "add_caption(\"Tabela 2. Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: tables/hypothesis_h1_results.csv, tables/hypothesis_h2_results.csv, tables/hypothesis_h3_distance_bins.csv, tables/regression_logistic_rescaled_odds_ratios.csv.\")",
+      "subprocess.run(cmd, check=True)"
+    ]
+  },
+  {
+    "path": "scratch/build_v3_1_master.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.enum.section",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "os",
+      "subprocess",
+      "pypdf",
+      "pypdfium2"
+    ],
+    "io_lines": [
+      "import subprocess",
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "add_caption(\"Tabela 2. Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: tables/hypothesis_h1_results.csv, tables/hypothesis_h2_results.csv, tables/hypothesis_h3_distance_bins.csv, tables/regression_logistic_rescaled_odds_ratios.csv.\")"
+    ]
+  },
+  {
+    "path": "scratch/build_v3_docx.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.enum.section",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "os"
+    ],
+    "io_lines": [
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "add_caption(\"Tabela 2. Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: tables/hypothesis_h1_results.csv, tables/hypothesis_h2_results.csv, tables/hypothesis_h3_distance_bins.csv, tables/regression_logistic_rescaled_odds_ratios.csv.\")"
+    ]
+  },
+  {
+    "path": "scratch/check_annual_vs_monthly_vector.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/check_pt010352_raw_mean.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "numpy"
+    ],
+    "io_lines": [
+      "with open('data/processed/extraction_slices/MA_x06_y04.json', 'r', encoding='utf-8') as f:"
+    ]
+  },
+  {
+    "path": "scratch/compare_all9_raw_pt010352.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "numpy",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "with open('data/processed/extraction_slices/MA_x06_y04.json', 'r', encoding='utf-8') as f:"
+    ]
+  },
+  {
+    "path": "scratch/compare_bootstrap_recalibration.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy",
+      "pyproj"
+    ],
+    "io_lines": [
+      "df = pd.read_parquet('data/processed/samples_annual.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/compare_legacy_vs_corrected_results.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "h1_old = pd.read_csv('tables_legacy_raw/hypothesis_h1_results.csv')",
+      "h1_new = pd.read_csv('tables/hypothesis_h1_results.csv')",
+      "h2_old = pd.read_csv('tables_legacy_raw/hypothesis_h2_results.csv')",
+      "h2_new = pd.read_csv('tables/hypothesis_h2_results.csv')",
+      "h3_old = pd.read_csv('tables_legacy_raw/hypothesis_h3_distance_bins.csv')",
+      "h3_new = pd.read_csv('tables/hypothesis_h3_distance_bins.csv')",
+      "h4_old = pd.read_csv('tables_legacy_raw/hypothesis_h4_robust_disagreement.csv')",
+      "h4_new = pd.read_csv('tables/hypothesis_h4_robust_disagreement.csv')",
+      "ind_old = pd.read_csv('tables_legacy_raw/descriptive_continuous_indicators.csv').set_index(['variable', 'subset'])",
+      "ind_new = pd.read_csv('tables/descriptive_continuous_indicators.csv').set_index(['variable', 'subset'])",
+      "reg_old = pd.read_csv('tables_legacy_raw/regression_logistic_rescaled_odds_ratios.csv')",
+      "reg_new = pd.read_csv('tables/regression_logistic_rescaled_odds_ratios.csv')",
+      "sp_old = pd.read_csv('tables_legacy_raw/spatial_bootstrap_contrasts.csv')",
+      "sp_new = pd.read_csv('tables/spatial_bootstrap_contrasts.csv')",
+      "rob_old = pd.read_csv('tables_legacy_raw/robustness_comprehensive_summary.csv')",
+      "rob_new = pd.read_csv('tables/robustness_comprehensive_summary.csv')"
+    ]
+  },
+  {
+    "path": "scratch/compile_manuscript_docx.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "os"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "scratch/compile_manuscript_pdf.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "os",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums",
+      "pypdf"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "scratch/compile_v3_fixed_order.py",
+    "docstring": null,
+    "imports": [
+      "os",
+      "sys",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums",
+      "pypdfium2",
+      "pypdf"
+    ],
+    "io_lines": [
+      "story.append(Paragraph(\"<b>Tabela 1.</b> Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: <i>tables/sampling_frame_10m.csv</i> e <i>tables/descriptive_regime_proportions.csv</i>.\", caption_style))",
+      "story.append(Paragraph(\"<b>Tabela 2.</b> Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: <i>tables/hypothesis_h1_results.csv</i>, <i>tables/hypothesis_h2_results.csv</i>, <i>tables/hypothesis_h3_distance_bins.csv</i>, <i>tables/regression_logistic_rescaled_odds_ratios.csv</i>.\", caption_style))"
+    ]
+  },
+  {
+    "path": "scratch/compile_v3_pdf.py",
+    "docstring": null,
+    "imports": [
+      "os",
+      "sys",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums",
+      "pypdfium2",
+      "pypdf"
+    ],
+    "io_lines": [
+      "story.append(Paragraph(\"<b>Tabela 1.</b> Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: <i>tables/sampling_frame_10m.csv</i> e <i>tables/descriptive_regime_proportions.csv</i>.\", caption_style))",
+      "story.append(Paragraph(\"<b>Tabela 2.</b> Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: <i>tables/hypothesis_h1_results.csv</i>, <i>tables/hypothesis_h2_results.csv</i>, <i>tables/hypothesis_h3_distance_bins.csv</i>, <i>tables/regression_logistic_rescaled_odds_ratios.csv</i>.\", caption_style))"
+    ]
+  },
+  {
+    "path": "scratch/compile_v3_perfect.py",
+    "docstring": null,
+    "imports": [
+      "os",
+      "sys",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums",
+      "pypdfium2",
+      "pypdf"
+    ],
+    "io_lines": [
+      "story.append(Paragraph(\"<b>Tabela 1.</b> Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: <i>tables/sampling_frame_10m.csv</i> e <i>tables/descriptive_regime_proportions.csv</i>.\", caption_style))",
+      "story.append(Paragraph(\"<b>Tabela 2.</b> Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: <i>tables/hypothesis_h1_results.csv</i>, <i>tables/hypothesis_h2_results.csv</i>, <i>tables/hypothesis_h3_distance_bins.csv</i>, <i>tables/regression_logistic_rescaled_odds_ratios.csv</i>.\", caption_style))"
+    ]
+  },
+  {
+    "path": "scratch/detailed_identity_audit_40k.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/evaluate_pilot2_results.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "numpy",
+      "pandas",
+      "scipy.spatial.distance"
+    ],
+    "io_lines": [
+      "df_pts = pd.read_csv('scratch/pilot2_sample_points.csv', keep_default_na=False)",
+      "with open('scratch/pilot2_bilinear_monthly_results.json', 'r', encoding='utf-8') as f:",
+      "df_mon_old = pd.read_parquet('data/processed/dw_monthly.parquet')",
+      "df_ann_old = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "res_df.to_csv('scratch/pilot2_evaluation_summary.csv', index=False)",
+      "res_df.to_csv('tables/pilot2_evaluation_summary.csv', index=False)"
+    ]
+  },
+  {
+    "path": "scratch/evaluate_pilot_results.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "df_pilot = pd.read_csv('scratch/pilot_sample_points.csv', keep_default_na=False)",
+      "df_mon_old = pd.read_parquet('data/processed/dw_monthly.parquet')",
+      "df_ann_old = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "with open('scratch/pilot_bilinear_monthly_results.json', 'r', encoding='utf-8') as f:",
+      "# 2. Old raw monthly from dw_monthly.parquet",
+      "res_df.to_csv('scratch/pilot_evaluation_summary.csv', index=False)"
+    ]
+  },
+  {
+    "path": "scratch/extract_stability_examples.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "merged = pd.read_parquet('scratch/diagnostic_stability_merged.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/inspect_ba_slice.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/inspect_div_margins.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "with open('scratch/pilot_bilinear_monthly_results.json', 'r', encoding='utf-8') as f:"
+    ]
+  },
+  {
+    "path": "scratch/inspect_slice_pt010352.py",
+    "docstring": null,
+    "imports": [
+      "json"
+    ],
+    "io_lines": [
+      "with open('data/processed/extraction_slices/MA_x06_y04.json', 'r', encoding='utf-8') as f:"
+    ]
+  },
+  {
+    "path": "scratch/investigate_an_na_stability.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/measure_layout.py",
+    "docstring": null,
+    "imports": [
+      "os",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "scratch/run_pilot2_extraction.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "pandas",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "df_pilot2 = pd.read_csv('scratch/pilot2_sample_points.csv', keep_default_na=False)",
+      "with open('scratch/pilot2_bilinear_monthly_results.json', 'w', encoding='utf-8') as f:",
+      "print(f\"Sucesso! Piloto 2 salvo com {len(out_list)} registros em scratch/pilot2_bilinear_monthly_results.json\")"
+    ]
+  },
+  {
+    "path": "scratch/run_pilot_extraction.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "pandas",
+      "numpy",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "df_pilot = pd.read_csv('scratch/pilot_sample_points.csv')",
+      "with open('scratch/pilot_extraction_results.json', 'w', encoding='utf-8') as f:",
+      "print(\"Salvo em scratch/pilot_extraction_results.json\")"
+    ]
+  },
+  {
+    "path": "scratch/run_pilot_extraction_clean.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "pandas",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "df_pilot = pd.read_csv('scratch/pilot_sample_points.csv', keep_default_na=False)",
+      "with open('scratch/pilot_bilinear_monthly_results.json', 'w', encoding='utf-8') as f:",
+      "print(f\"Resultado final salvo com {len(out_list)} registros em scratch/pilot_bilinear_monthly_results.json!\")"
+    ]
+  },
+  {
+    "path": "scratch/select_pilot_points.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')",
+      "pilot_df.to_csv('scratch/pilot_sample_points.csv', index=False)"
+    ]
+  },
+  {
+    "path": "scratch/test_a_vs_b_pt010352.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "scratch/test_build_v3.py",
+    "docstring": null,
+    "imports": [
+      "os",
+      "sys",
+      "reportlab.lib.pagesizes",
+      "reportlab.lib.units",
+      "reportlab.platypus",
+      "reportlab.lib.styles",
+      "reportlab.lib",
+      "reportlab.lib.enums",
+      "pypdfium2",
+      "pypdf"
+    ],
+    "io_lines": [
+      "story.append(Paragraph(\"<b>Tabela 1.</b> Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: <i>tables/sampling_frame_10m.csv</i> e <i>tables/descriptive_regime_proportions.csv</i>.\", caption_style))",
+      "story.append(Paragraph(\"<b>Tabela 2.</b> Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: <i>tables/hypothesis_h1_results.csv</i>, <i>tables/hypothesis_h2_results.csv</i>, <i>tables/hypothesis_h3_distance_bins.csv</i>, <i>tables/regression_logistic_rescaled_odds_ratios.csv</i>.\", caption_style))"
+    ]
+  },
+  {
+    "path": "scratch/test_full_v3_1.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "subprocess",
+      "pypdf",
+      "os",
+      "pypdfium2"
+    ],
+    "io_lines": [
+      "import subprocess, pypdf, os",
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "add_caption(\"Tabela 2. Contrastes das hipóteses H1–H3 e modelo logístico multivariado sob Spatial Block Bootstrap (30 km, 1.999 réplicas). Fontes: tables/hypothesis_h1_results.csv, tables/hypothesis_h2_results.csv, tables/hypothesis_h3_distance_bins.csv, tables/regression_logistic_rescaled_odds_ratios.csv.\")",
+      "subprocess.run(cmd, check=True)"
+    ]
+  },
+  {
+    "path": "scratch/test_hypothesis_impact.py",
+    "docstring": null,
+    "imports": [
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/test_p1_p2_runner.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "subprocess",
+      "pypdf"
+    ],
+    "io_lines": [
+      "import subprocess, pypdf",
+      "subprocess.run(cmd, check=True)"
+    ]
+  },
+  {
+    "path": "scratch/test_p1_p3_runner.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "subprocess",
+      "pypdf",
+      "os"
+    ],
+    "io_lines": [
+      "import subprocess, pypdf, os",
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "subprocess.run(cmd, check=True)"
+    ]
+  },
+  {
+    "path": "scratch/test_p1_p4_runner.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "subprocess",
+      "pypdf",
+      "os"
+    ],
+    "io_lines": [
+      "import subprocess, pypdf, os",
+      "add_caption(\"Tabela 1. Composição censitária e amostral ponderada por regime temático e estado no MATOPIBA (2025). Fontes: tables/sampling_frame_10m.csv e tables/descriptive_regime_proportions.csv.\")",
+      "subprocess.run(cmd, check=True)"
+    ]
+  },
+  {
+    "path": "scratch/test_pt010352_gee.py",
+    "docstring": null,
+    "imports": [
+      "sys",
+      "pathlib",
+      "ee",
+      "json",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "scratch/test_table_layouts.py",
+    "docstring": null,
+    "imports": [
+      "docx",
+      "docx.shared",
+      "docx.enum.text",
+      "docx.enum.table",
+      "docx.oxml",
+      "docx.oxml.ns",
+      "os"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "scratch/validate_full_40k_identity.py",
+    "docstring": null,
+    "imports": [
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "df_ann = pd.read_parquet('data/processed/samples_annual.parquet')",
+      "df_mon = pd.read_parquet('data/processed/dw_monthly.parquet')"
+    ]
+  },
+  {
+    "path": "scratch/verify_pdf_typography.py",
+    "docstring": null,
+    "imports": [
+      "pdfplumber"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/analysis/02_weighted_descriptive_analysis.py",
+    "docstring": "02_weighted_descriptive_analysis.py — Estimativas Descritivas Baseadas no Desenho Amostral\n==========================================================================================\nCalcula as estimativas ponderadas primárias para a Amostra Principal de 20.000 pontos\n(e Amostra Robusta de 40.000 pontos como robustez) respeitando estritamente o desenho\namostral estratificado e os pesos de expansão Horvitz-Thompson.\n\nGera:\n  - tables/descriptive_regime_proportions.csv\n  - tables/descriptive_state_proportions.csv\n  - tables/descriptive_continuous_indicators.csv\n  - tables/descriptive_robust_40k_comparison.csv",
+    "imports": [
+      "__future__",
+      "sys",
+      "pathlib",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "- tables/descriptive_regime_proportions.csv",
+      "- tables/descriptive_state_proportions.csv",
+      "- tables/descriptive_continuous_indicators.csv",
+      "- tables/descriptive_robust_40k_comparison.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_regime_summary.to_csv(TABLES_DIR / \"descriptive_regime_proportions.csv\", index=False)",
+      "df_state_summary.to_csv(TABLES_DIR / \"descriptive_state_proportions.csv\", index=False)",
+      "df_cont_summary.to_csv(TABLES_DIR / \"descriptive_continuous_indicators.csv\", index=False)",
+      "df_rob_comp.to_csv(TABLES_DIR / \"descriptive_robust_40k_comparison.csv\", index=False)"
+    ]
+  },
+  {
+    "path": "src/analysis/03_hypothesis_tests_h1_h4.py",
+    "docstring": "03_hypothesis_tests_h1_h4.py — Testes Formais das Hipóteses H1–H4\n================================================================\nExecuta a análise inferencial das quatro hipóteses centrais de pesquisa:\n  - H1: Ambiguidade probabilística (H_annual discordante > concordante)\n  - H2: Instabilidade temporal (JSD discordante > concordante; S discordante < concordante)\n  - H3: Efeito de borda (P(D=1) diminui com a distância à borda mais próxima)\n  - H4: Caracterização do subconjunto de discordâncias robustas internamente\n\nGera:\n  - tables/hypothesis_h1_results.csv\n  - tables/hypothesis_h2_results.csv\n  - tables/hypothesis_h3_distance_bins.csv\n  - tables/hypothesis_h4_robust_disagreement.csv",
+    "imports": [
+      "__future__",
+      "sys",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "scipy"
+    ],
+    "io_lines": [
+      "- tables/hypothesis_h1_results.csv",
+      "- tables/hypothesis_h2_results.csv",
+      "- tables/hypothesis_h3_distance_bins.csv",
+      "- tables/hypothesis_h4_robust_disagreement.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_h1.to_csv(TABLES_DIR / \"hypothesis_h1_results.csv\", index=False)",
+      "df_h2.to_csv(TABLES_DIR / \"hypothesis_h2_results.csv\", index=False)",
+      "df_h3.to_csv(TABLES_DIR / \"hypothesis_h3_distance_bins.csv\", index=False)",
+      "df_h4_table.to_csv(TABLES_DIR / \"hypothesis_h4_robust_disagreement.csv\", index=False)"
+    ]
+  },
+  {
+    "path": "src/analysis/04_weighted_regression_model.py",
+    "docstring": "04_weighted_regression_model.py — Modelagem de Regressão Logística Ponderada\n============================================================================\nAjusta modelos de regressão logística ponderados pelo desenho amostral:\n  logit[P(D=1)] = beta_0 + beta_1 * H_annual + beta_2 * JSD_temporal\n                  + beta_3 * stability + beta_4 * distance + gamma_state\n\nExamina colinearidade (VIF, correlações) e reporta coeficientes e Razões de\nChance (Odds Ratios) com intervalos de confiança de 95%.\n\nGera:\n  - tables/regression_collinearity_diagnostics.csv\n  - tables/regression_logistic_primary_model.csv\n  - tables/regression_model_comparison.csv",
+    "imports": [
+      "__future__",
+      "sys",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "statsmodels.api",
+      "statsmodels.formula.api",
+      "statsmodels.stats.outliers_influence"
+    ],
+    "io_lines": [
+      "- tables/regression_collinearity_diagnostics.csv",
+      "- tables/regression_logistic_primary_model.csv",
+      "- tables/regression_model_comparison.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_vif.to_csv(TABLES_DIR / \"regression_collinearity_diagnostics.csv\", index=False)",
+      "df_res_prim.to_csv(TABLES_DIR / \"regression_logistic_primary_model.csv\", index=False)",
+      "df_comp.to_csv(TABLES_DIR / \"regression_model_comparison.csv\", index=False)",
+      "boot_file = TABLES_DIR / \"spatial_bootstrap_logistic_model.csv\"",
+      "df_rescaled.to_csv(TABLES_DIR / \"regression_logistic_rescaled_odds_ratios.csv\", index=False)"
+    ]
+  },
+  {
+    "path": "src/analysis/05_spatial_block_bootstrap.py",
+    "docstring": "05_spatial_block_bootstrap.py — Incerteza Espacial via Semivariograma e Block Bootstrap\n========================================================================================\nProcedimento pré-registrado de incerteza espacial:\n  1. Amostra principal de 20k projetada em CRS métrico (EPSG:5880).\n  2. Semivariograma empírico do indicador de discordância D.\n  3. Ajuste de modelo exponencial: alcance prático (95% do sill) arredondado para múltiplo de 5 km superior (30 km).\n  4. Spatial Block Bootstrap: 1.999 replicações, seed=25.\n  5. Intervalos de confiança de 95% (percentis 2.5% e 97.5%) para os contrastes H1–H3 e modelo logístico.\n  6. Análise de sensibilidade ao tamanho do bloco: 10 km, 20 km, 40 km.\n\nGera:\n  - tables/spatial_semivariogram_parameters.csv\n  - tables/spatial_bootstrap_contrasts.csv\n  - tables/spatial_bootstrap_distance_bins.csv\n  - tables/spatial_bootstrap_logistic_model.csv\n  - tables/spatial_bootstrap_block_sensitivity.csv",
+    "imports": [
+      "__future__",
+      "sys",
+      "time",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "pyproj",
+      "scipy.optimize",
+      "scipy.spatial.distance",
+      "statsmodels.api"
+    ],
+    "io_lines": [
+      "- tables/spatial_semivariogram_parameters.csv",
+      "- tables/spatial_bootstrap_contrasts.csv",
+      "- tables/spatial_bootstrap_distance_bins.csv",
+      "- tables/spatial_bootstrap_logistic_model.csv",
+      "- tables/spatial_bootstrap_block_sensitivity.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_semiv.to_csv(TABLES_DIR / \"spatial_semivariogram_parameters.csv\", index=False)",
+      "df_contrasts.to_csv(TABLES_DIR / \"spatial_bootstrap_contrasts.csv\", index=False)",
+      "df_boot_bins.to_csv(TABLES_DIR / \"spatial_bootstrap_distance_bins.csv\", index=False)",
+      "df_boot_reg.to_csv(TABLES_DIR / \"spatial_bootstrap_logistic_model.csv\", index=False)",
+      "df_sens.to_csv(TABLES_DIR / \"spatial_bootstrap_block_sensitivity.csv\", index=False)"
+    ]
+  },
+  {
+    "path": "src/analysis/06_robustness_analysis.py",
+    "docstring": "06_robustness_analysis.py — Análises de Robustez Obrigatórias (Checkpoint 4)\n===========================================================================\nExecuta as análises de robustez que utilizam a mesma população elegível congelada (n_valid_months >= 8):\n  - R1: Tamanho Amostral (Amostra Principal 20k vs Amostra Robusta 40k)\n  - R2: Crosswalk Estrito MapBiomas ({19} Lavoura Temporária vs Primário {19, 36})\n  - R3: Subconjunto com Estabilidade Histórica MapBiomas 2017–2025 (9 anos contínuos)\n\nGera:\n  - tables/robustness_r1_sample_size_comparison.csv\n  - tables/robustness_r2_strict_crosswalk_comparison.csv\n  - tables/robustness_r3_mapbiomas_stability_subset.csv\n  - tables/robustness_comprehensive_summary.csv",
+    "imports": [
+      "__future__",
+      "sys",
+      "pathlib",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "- tables/robustness_r1_sample_size_comparison.csv",
+      "- tables/robustness_r2_strict_crosswalk_comparison.csv",
+      "- tables/robustness_r3_mapbiomas_stability_subset.csv",
+      "- tables/robustness_comprehensive_summary.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_summary.to_csv(TABLES_DIR / \"robustness_comprehensive_summary.csv\", index=False)",
+      "df_r1.to_csv(TABLES_DIR / \"robustness_r1_sample_size_comparison.csv\", index=False)",
+      "df_r2.to_csv(TABLES_DIR / \"robustness_r2_strict_crosswalk_comparison.csv\", index=False)",
+      "df_r3.to_csv(TABLES_DIR / \"robustness_r3_mapbiomas_stability_subset.csv\", index=False)"
+    ]
+  },
+  {
+    "path": "src/analysis/07_generate_publication_figures.py",
+    "docstring": "07_generate_publication_figures.py — Geração das Figuras Científicas do Checkpoint 4\n====================================================================================\nGera as 6 figuras de alta resolução (300 DPI) para publicação científica:\n  1. figures/fig1_composition_regimes.png: Composição ponderada dos regimes AA/AN/NA/NN\n  2. figures/fig2_h_annual_distribution.png: Distribuição de H_annual (Concordância vs Discordância)\n  3. figures/fig3_jsd_temporal_distribution.png: Distribuição de JSD_temporal (Concordância vs Discordância)\n  4. figures/fig4_stability_distribution.png: Distribuição da Estabilidade Temporal (Concordância vs Discordância)\n  5. figures/fig5_disagreement_by_distance_bin.png: Proporção de discordância por faixa de distância\n  6. figures/fig6_h4_robust_disagreement_characterization.png: Caracterização multivariada do filtro H4",
+    "imports": [
+      "__future__",
+      "sys",
+      "pathlib",
+      "matplotlib.pyplot",
+      "numpy",
+      "pandas",
+      "scipy.stats"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DATA_PARQUET = BASE_DIR / \"data\" / \"processed\" / \"samples_annual.parquet\"",
+      "df_h3_bins = pd.read_csv(TABLES_DIR / \"spatial_bootstrap_distance_bins.csv\")",
+      "h4_csv_path = TABLES_DIR / \"hypothesis_h4_robust_disagreement.csv\""
+    ]
+  },
+  {
+    "path": "src/analysis/08_master_h1_h4_runner.py",
+    "docstring": "08_master_h1_h4_runner.py — Orquestrador Mestre de Análise e Inferência (Checkpoint 4)\n=====================================================================================\nExecuta em sequência reprodutível todos os módulos de análise estatística, espacial\ne visual das hipóteses H1–H4 sobre a população analítica congelada:\n  1. 02_weighted_descriptive_analysis.py\n  2. 03_hypothesis_tests_h1_h4.py\n  3. 04_weighted_regression_model.py\n  4. 05_spatial_block_bootstrap.py\n  5. 06_robustness_analysis.py\n  6. 07_generate_publication_figures.py\n\nValida a existência e integridade de todas as tabelas e figuras produzidas.",
+    "imports": [
+      "__future__",
+      "subprocess",
+      "sys",
+      "time",
+      "pathlib"
+    ],
+    "io_lines": [
+      "import subprocess",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "\"descriptive_regime_proportions.csv\",",
+      "\"descriptive_state_proportions.csv\",",
+      "\"descriptive_continuous_indicators.csv\",",
+      "\"descriptive_robust_40k_comparison.csv\",",
+      "\"hypothesis_h1_results.csv\",",
+      "\"hypothesis_h2_results.csv\",",
+      "\"hypothesis_h3_distance_bins.csv\",",
+      "\"hypothesis_h4_robust_disagreement.csv\",",
+      "\"regression_collinearity_diagnostics.csv\",",
+      "\"regression_logistic_primary_model.csv\",",
+      "\"regression_logistic_rescaled_odds_ratios.csv\",",
+      "\"regression_model_comparison.csv\",",
+      "\"spatial_semivariogram_parameters.csv\",",
+      "\"spatial_bootstrap_contrasts.csv\",",
+      "\"spatial_bootstrap_distance_bins.csv\",",
+      "\"spatial_bootstrap_logistic_model.csv\",",
+      "\"spatial_bootstrap_block_sensitivity.csv\",",
+      "\"robustness_r1_sample_size_comparison.csv\",",
+      "\"robustness_r2_strict_crosswalk_comparison.csv\",",
+      "\"robustness_r3_mapbiomas_stability_subset.csv\",",
+      "\"robustness_comprehensive_summary.csv\",",
+      "res = subprocess.run([python_exe, str(script_path)], capture_output=True, text=True, cwd=str(BASE_DIR))"
+    ]
+  },
+  {
+    "path": "src/gee/00_identity_test.py",
+    "docstring": "00_identity_test.py — Implementation Identity Test against Checkpoint 1 Prototype\n================================================================================\nValidates that src/gee/dw_annual.py exactly reproduces the approved Checkpoint 1\nprototype samples (data/processed/prototype_samples.csv):\n  1. Annual class matches argmax of 9 normalized probabilities\n  2. 9 probabilities match within numerical tolerance (1e-4)\n  3. n_valid_months matches exactly\n  4. probability_sum_before_normalization matches within numerical tolerance",
+    "imports": [
+      "__future__",
+      "sys",
+      "time",
+      "pathlib",
+      "ee",
+      "numpy",
+      "pandas",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "prototype samples (data/processed/prototype_samples.csv):",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "CSV_PATH = BASE_DIR / \"data\" / \"processed\" / \"prototype_samples.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/01_check_access.py",
+    "docstring": null,
+    "imports": [
+      "__future__",
+      "sys",
+      "ee"
+    ],
+    "io_lines": [
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "ee.Initialize(project=PROJECT_ID)",
+      "print(f\"Google Cloud Project: {PROJECT_ID}\")"
+    ]
+  },
+  {
+    "path": "src/gee/02_boundary.py",
+    "docstring": "02_boundary.py — Materialização da delimitação oficial do MATOPIBA\n===================================================================\nObtém a lista oficial dos 337 municípios do MATOPIBA do IBGE e as\nmalhas municipais oficiais (IBGE 2024/2025), consolidando a geometria\ncongelada e a lista de municípios.\n\nConforme PROJECT_BRIEF.md (Seção 6):\n  data/reference/matopiba_boundary.geojson\n  data/reference/matopiba_municipalities.csv",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "io",
+      "json",
+      "urllib.request",
+      "datetime",
+      "pathlib",
+      "geopandas",
+      "pandas",
+      "requests"
+    ],
+    "io_lines": [
+      "data/reference/matopiba_boundary.geojson",
+      "data/reference/matopiba_municipalities.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "csv_path = DATA_REF / \"matopiba_municipalities.csv\"",
+      "states_geojson_path = DATA_REF / \"matopiba_states.geojson\"",
+      "geojson_path = DATA_REF / \"matopiba_boundary.geojson\""
+    ]
+  },
+  {
+    "path": "src/gee/02_prototype_pipeline.py",
+    "docstring": "Dynamic World x MapBiomas — Prototype Pipeline (Checkpoint 1)\n=============================================================\nExecutes technical validation checkpoint for ~500 points across 4 windows\nin the MATOPIBA completo using the official frozen boundary.\n\nRequirements addressed:\n  - Official boundary from data/reference/matopiba_boundary.geojson\n  - Dynamic World V1: [2025-01-01, 2026-01-01)\n  - MapBiomas 10m Col 4: classification_2025\n  - Daily neutral composite -> Monthly mean -> Annual equal-weight\n  - Per-point per-month observation counting (n_obs_m01..m12, n_valid_months)\n  - 10m primary grid + Real 30m aggregation via reduceResolution(mean) & reduceResolution(mode)\n  - Robust crosswalk handling (19, 36 CROP; 21, 18 EXCLUDED; others NONCROP)\n  - AA / AN / NA / NN agreement regimes\n  - Edge detection with EXCLUDED masked & direct fastDistanceTransform (no edge.Not())\n  - Normalized probability vector (p'_k = p_k / sum(p)) with probability_sum_before_normalization preserved\n  - Automated validation & config/experiment.yaml generation",
+    "imports": [
+      "__future__",
+      "csv",
+      "hashlib",
+      "json",
+      "math",
+      "sys",
+      "time",
+      "collections",
+      "datetime",
+      "pathlib",
+      "ee",
+      "yaml",
+      "traceback"
+    ],
+    "io_lines": [
+      "- Official boundary from data/reference/matopiba_boundary.geojson",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "BOUNDARY_GEOJSON = DATA_REF / \"matopiba_boundary.geojson\"",
+      "MUNICIPALITIES_CSV = DATA_REF / \"matopiba_municipalities.csv\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "ee.Initialize(project=PROJECT_ID)",
+      "log(f\"Earth Engine inicializado com projeto: {PROJECT_ID}\")",
+      "out_path = DATA_PROC / \"prototype_samples.csv\"",
+      "\"boundary_file\": \"data/reference/matopiba_boundary.geojson\",",
+      "\"municipalities_file\": \"data/reference/matopiba_municipalities.csv\","
+    ]
+  },
+  {
+    "path": "src/gee/03_audit_prototype.py",
+    "docstring": "03_audit_prototype.py — Auditoria independente do protótipo técnico de 500 pontos\n================================================================================\nImplementa todas as verificações exigidas por .agents/skills/audit-gee-prototype/SKILL.md\ne valida com rigor matemático as 5 correções solicitadas pela auditoria humana:\n1. Distâncias de borda (fastDistanceTransform direto sobre edge=1, excluded mascarados);\n2. Soma de probabilidades unitária pós-normalização e auditoria da soma bruta;\n3. Sensibilidade 30 m com agregação real 10 m -> 30 m (DW mean, MB mode);\n4. MapBiomas código 18 tratado robustamente como EXCLUDED;\n5. Cobertura temporal comprovada por ponto (n_obs por mês e n_valid_months).",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "json",
+      "collections",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "yaml"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "CSV_PATH = BASE_DIR / \"data\" / \"processed\" / \"prototype_samples.csv\"",
+      "GEOJSON_PATH = BASE_DIR / \"data\" / \"reference\" / \"matopiba_boundary.geojson\"",
+      "MUN_PATH = BASE_DIR / \"data\" / \"reference\" / \"matopiba_municipalities.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/04_wall_to_wall.py",
+    "docstring": "04_wall_to_wall.py — Authoritative Wall-to-Wall Cropland Disagreement Analysis\n=============================================================================\nCalculates the wall-to-wall cropland agreement/disagreement for the entire MATOPIBA\ndomain in 2025 using ONLY:\n  - Authoritative Annual Dynamic World 2025 (src/gee/dw_annual.py)\n  - MapBiomas Cobertura 10m Collection 4 (classification_2025)\n  - Frozen immutable crosswalk (CROP: 19, 36; EXCLUDED: 18, 21; NONCROP: other valid)\n  - Real area via ee.Image.pixelArea() (never sample estimation)\n\nOutputs:\n  - data/processed/wall_to_wall_summary.csv\n  - data/processed/wall_to_wall_slices_checkpoint.json",
+    "imports": [
+      "__future__",
+      "json",
+      "socket",
+      "sys",
+      "time",
+      "datetime",
+      "pathlib",
+      "ee",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "- data/processed/wall_to_wall_summary.csv",
+      "- data/processed/wall_to_wall_slices_checkpoint.json",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "SUMMARY_CSV = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "CHECKPOINT_FILE = DATA_PROC / \"wall_to_wall_slices_checkpoint.json\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/04_wall_to_wall_10m.py",
+    "docstring": "04_wall_to_wall_10m.py — Authoritative 10m Wall-to-Wall Analysis & Exact Population Frame\n========================================================================================\nExecutes the definitive wall-to-wall analysis strictly on the frozen 10m MapBiomas grid:\n  - crs: MapBiomas CRS (EPSG:4326)\n  - crsTransform: Official 10m transform ([0.00008983152841195215, 0, -75.62655865569857, 0, -0.00008983152841195215, 6.763595437192701])\n  - Disjoint, non-overlapping deterministic spatial grid slices covering 100% of MATOPIBA\n  - Computes exact ellipsoidal area (ha via ee.Image.pixelArea()) AND exact unweighted cell counts (N_h_exact)\n  - Full temporal coverage QA (0..12 valid months)\n\nOutputs:\n  - data/processed/wall_to_wall_summary_10m_AUDIT.csv\n  - tables/sampling_frame_10m.csv\n  - tables/dw_valid_months_area.csv\n  - tables/sampling_quotas_10m_AUDIT.csv",
+    "imports": [
+      "__future__",
+      "json",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "ee",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "- data/processed/wall_to_wall_summary_10m_AUDIT.csv",
+      "- tables/sampling_frame_10m.csv",
+      "- tables/dw_valid_months_area.csv",
+      "- tables/sampling_quotas_10m_AUDIT.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "SUMMARY_10M_CSV = DATA_PROC / \"wall_to_wall_summary_10m_AUDIT.csv\"",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "TEMPORAL_QA_CSV = TABLES_DIR / \"dw_valid_months_area.csv\"",
+      "QUOTAS_10M_CSV = TABLES_DIR / \"sampling_quotas_10m_AUDIT.csv\"",
+      "CHECKPOINT_FILE = DATA_PROC / \"wall_to_wall_10m_slices_checkpoint.json\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "# Build sampling_frame_10m.csv (Slice level and State level)",
+      "# Combine slice frame and strata summary in sampling_frame_10m.csv",
+      "# Build wall_to_wall_summary_10m_AUDIT.csv",
+      "# Build dw_valid_months_area.csv",
+      "# Build sampling_quotas_10m_AUDIT.csv (Hamilton allocation)"
+    ]
+  },
+  {
+    "path": "src/gee/04_wall_to_wall_canonical_interactive.py",
+    "docstring": "04_wall_to_wall_canonical_interactive.py — Interactive Slice Reduction with Checkpointing\n=======================================================================================\nComputes the canonical 10m wall-to-wall metrics per slice with continuous JSON checkpointing.\nWorks in parallel with the GEE batch export (whichever completes all 183 slices first is used).\n\nUses the CANONICAL RASTER:\n  - Fixed support domain (MATOPIBA + 5,000 m)\n  - Precomputed monthly dates\n  - 16 canonical area (ha) and cell count bands\n  - Slices used for computational reduction only\n\nSaves checkpoints to:\n  data/processed/canonical_wall_to_wall_slices_checkpoint.json",
+    "imports": [
+      "__future__",
+      "json",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "datetime",
+      "pathlib",
+      "typing",
+      "concurrent.futures",
+      "ee",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "data/processed/canonical_wall_to_wall_slices_checkpoint.json",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "CKPT_FILE = DATA_PROC / \"canonical_wall_to_wall_slices_checkpoint.json\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/05_audit_design_and_quotas.py",
+    "docstring": "05_audit_design_and_quotas.py — Complete Audit of 10m Frame, Slice Design, Main Subsampling & EPSG:5880\n======================================================================================================\nImplements all required audits for Checkpoint 2B:\n  1. Quotas comparison: 30m vs 10m frame\n  2. Audit of the real design by slice:\n     - N_hs_exact, A_hs, n_robust_hs\n     - pi_robust_hs, design_weight_robust, area_weight_robust\n     - min(pi), max(pi), CV(pi) within each state x regime\n  3. Deterministic pseudo-random main subsampling via SHA256:\n     - rank_within_stratum based on SHA256(25|main_rank|state|regime|lon|lat)\n     - exactly 20,000 main points nested in 40,000 robust points\n     - distinct inclusion probabilities and design/area weights for main and robust\n  4. Spatial diagnostics in EPSG:5880 (SIRGAS 2000 / Brazil Polyconic):\n     - Nearest-neighbor distances (m)\n     - Metric grid occupancy (50km x 50km)\n  5. Rigorous scientific validation and verification of all Checkpoint 2B criteria.",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "json",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "pyproj",
+      "scipy.spatial",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "SUMMARY_30M_CSV = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "SUMMARY_10M_CSV = DATA_PROC / \"wall_to_wall_summary_10m_AUDIT.csv\"",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "TEMPORAL_QA_CSV = TABLES_DIR / \"dw_valid_months_area.csv\"",
+      "QUOTAS_30M_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "QUOTAS_10M_CSV = TABLES_DIR / \"sampling_quotas_10m_AUDIT.csv\"",
+      "POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "CHECKPOINT_10M = DATA_PROC / \"wall_to_wall_10m_slices_checkpoint.json\"",
+      "SLICE_DESIGN_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/05_compute_quotas.py",
+    "docstring": "05_compute_quotas.py — Cálculo das Quotas Amostrais para os 16 Estratos\n========================================================================\nCalcula as quotas para a amostra principal (N = 20.000) e robustez (N = 40.000)\nusando o método Hamilton / largest-remainder.\n\nEstratos: {MA, TO, PI, BA} x {AA, AN, NA, NN} = 16 estratos.\nBase: n_min = 400 por estrato ativo (16 * 400 = 6.400).\nRestante: 20.000 - 6.400 = 13.600 proporcional à área territorial W_h.\nRobustez: n_h_robust = 2 * n_h_main (sum = 40.000).\n\nSalva: tables/sampling_quotas.csv",
+    "imports": [
+      "__future__",
+      "math",
+      "pathlib",
+      "pandas"
+    ],
+    "io_lines": [
+      "Salva: tables/sampling_quotas.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "W2W_CSV = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "OUT_CSV = TABLES_DIR / \"sampling_quotas.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/06_master_sample_pipeline.py",
+    "docstring": "06_master_sample_pipeline.py — Master Sample Generation & Materialization from 10m Frame\n========================================================================================\nGenerates the definitive 40,000-point master sampling pool (with 20,000 nested main points)\nstrictly from the audited 10m sampling frame and updated 10m quotas:\n  - Hamilton largest-remainder allocation across active 10m slices proportional to N_hs_exact\n  - Exact robust quotas per stratum summing to 40,000\n  - Deterministic pseudo-random main subsampling via SHA256(25|main_rank|state|regime|lon|lat)\n  - Separate inclusion probabilities and weights for robust and main\n  - Verification of 100% stratum match on frozen 10m rasters\n  - Nearest-neighbor distances and 50km grid occupancy in EPSG:5880",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "json",
+      "math",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "requests",
+      "ee",
+      "numpy",
+      "pandas",
+      "pyproj",
+      "scipy.spatial",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "CHECKPOINT_10M_SLICES = DATA_PROC / \"wall_to_wall_10m_slices_checkpoint.json\"",
+      "CHECKPOINT_POINTS = DATA_PROC / \"master_sample_10m_points_checkpoint.json\"",
+      "OUT_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "SLICE_DESIGN_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/07_audit_master_sample.py",
+    "docstring": "07_audit_master_sample.py — Rigorous Scientific Audit of the Definitive 10m Master Sample\n========================================================================================\nAudits the definitive 40,000-point master sample (and 20,000-point main subsample) against:\n  1. Counts: Total = 40,000, Main = 20,000, Robust = 40,000\n  2. Spatial uniqueness: Duplicates (lon, lat) = 0\n  3. Boundary correctness: Outside MATOPIBA = 0, Wrong State = 0\n  4. Quota compliance: Zero quota violations across all 16 strata\n  5. Corrected terminology:\n     - \"Pixels MapBiomas excluídos (18/21) presentes na amostra = 0\"\n     - \"Pixels Dynamic World temporalmente inelegíveis (<8 meses) = 0\"\n  6. Inclusion probabilities & weights:\n     - Verified distinct inclusion probabilities and design/area weights for main vs robust\n  7. Stratum membership match against frozen 10m rasters: 100.0%\n  8. Spatial diagnostics in EPSG:5880 (SIRGAS 2000 / Brazil Polyconic):\n     - Nearest-neighbor distance statistics (m)\n     - 50 km x 50 km metric grid occupancy\n  9. SHA-256 hashes of all frozen artifacts",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "pathlib",
+      "numpy",
+      "pandas",
+      "pyproj",
+      "scipy.spatial",
+      "shapely.geometry",
+      "json",
+      "shapely.ops"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "TEMPORAL_QA_CSV = TABLES_DIR / \"dw_valid_months_area.csv\"",
+      "SUMMARY_10M_CSV = DATA_PROC / \"wall_to_wall_summary_10m_AUDIT.csv\"",
+      "POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "SLICE_DESIGN_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "DATA_PROC / \"wall_to_wall_summary_10m_AUDIT.csv\",",
+      "TABLES_DIR / \"sampling_frame_10m.csv\",",
+      "TABLES_DIR / \"dw_valid_months_area.csv\",",
+      "TABLES_DIR / \"sampling_quotas_10m_AUDIT.csv\",",
+      "DATA_PROC / \"master_sampling_points.csv\","
+    ]
+  },
+  {
+    "path": "src/gee/08_patch_area_weights.py",
+    "docstring": "08_patch_area_weights.py — Patch A: Area Weights Exatos por Ponto\n================================================================\nExtrai pixel_area_m2 = ee.Image.pixelArea() para cada uma das 40.000\ncoordenadas congeladas da Master Sample e recalcula:\n  area_weight_robust = pixel_area_m2 / selection_probability_robust\n  area_weight_main = pixel_area_m2 / selection_probability_main (se main_sample == 1)\n  area_weight_main = NaN (se main_sample == 0)\n\nPreserva estritamente:\n  - sample_id, lat, lon, state, stratum_id, regime, slice_id\n  - main_sample, robust_sample, rank_within_stratum\n  - root_seed, stratum_seed\n  - selection_probability_robust, design_weight_robust\n  - selection_probability_main, design_weight_main",
+    "imports": [
+      "__future__",
+      "json",
+      "sys",
+      "time",
+      "datetime",
+      "pathlib",
+      "ee",
+      "numpy",
+      "pandas",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "MASTER_POINTS_CSV = PROC_DIR / \"master_sampling_points.csv\"",
+      "BACKUP_POINTS_CSV = PROC_DIR / \"master_sampling_points_BEFORE_AREA_WEIGHT_PATCH.csv\"",
+      "CHECKPOINT_JSON = PROC_DIR / \"pixel_area_m2_checkpoint.json\"",
+      "DESIGN_AUDIT_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "# 7. Salvar atualizado no MESMO master_sampling_points.csv"
+    ]
+  },
+  {
+    "path": "src/gee/09_patch_boundary_vs_raster.py",
+    "docstring": "09_patch_boundary_vs_raster.py — Patch B: Área do Boundary vs Cobertura Raster\n=============================================================================\nCalcula separadamente:\n  1. boundary_vector_area_geodesic_ha (área geodésica WGS84 do vetor oficial)\n  2. boundary_vector_area_epsg5880_ha (área projetada SIRGAS 2000 Policonica)\n  3. mapbiomas_raster_covered_area_ha (soma das células 10m com dado MapBiomas)\n  4. difference_boundary_vs_raster_ha (discrepância boundary vs raster)\n  5. difference_pct (percentual de diferença)\n\nGera:\n  tables/boundary_vs_raster_area_comparison.csv\ne exporta os valores para inclusão no sampling_manifest.yaml.",
+    "imports": [
+      "__future__",
+      "json",
+      "sys",
+      "datetime",
+      "pathlib",
+      "geopandas",
+      "pandas",
+      "pyproj"
+    ],
+    "io_lines": [
+      "tables/boundary_vs_raster_area_comparison.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "BOUNDARY_GEOJSON = BASE_DIR / \"data\" / \"reference\" / \"matopiba_boundary.geojson\"",
+      "SUMMARY_10M_CSV = BASE_DIR / \"data\" / \"processed\" / \"wall_to_wall_summary_10m_AUDIT.csv\"",
+      "OUTPUT_CSV = BASE_DIR / \"tables\" / \"boundary_vs_raster_area_comparison.csv\"",
+      "# Atualizar wall_to_wall_summary_10m_AUDIT.csv e wall_to_wall_summary.csv"
+    ]
+  },
+  {
+    "path": "src/gee/10_generate_manifest.py",
+    "docstring": "10_generate_manifest.py — Geração do Sampling Manifest Congelado (Checkpoint 3B)\n================================================================================\nCria config/sampling_manifest.yaml consolidando todos os metadados,\nregras probabilísticas, estratos, fatias, fórmulas e hashes SHA-256\ndos artefatos congelados da amostragem no MATOPIBA com cobertura 100%.",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "datetime",
+      "pathlib",
+      "pandas",
+      "yaml"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "boundary_path = DATA_REF / \"matopiba_boundary.geojson\"",
+      "muni_path = DATA_REF / \"matopiba_municipalities.csv\"",
+      "states_path = DATA_REF / \"matopiba_states.geojson\"",
+      "w2w_path = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "w2w_audit_path = DATA_PROC / \"wall_to_wall_summary_10m_AUDIT.csv\"",
+      "frame_path = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "quotas_path = TABLES_DIR / \"sampling_quotas.csv\"",
+      "alloc_final_path = TABLES_DIR / \"slice_sampling_allocation_final.csv\"",
+      "zero_pi_audit_path = TABLES_DIR / \"zero_inclusion_substrata_audit.csv\"",
+      "dw_diag_path = TABLES_DIR / \"dw_annual_identity_diagnostic.csv\"",
+      "master_path = DATA_PROC / \"master_sampling_points.csv\"",
+      "audit_slice_path = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "boundary_vs_raster_path = TABLES_DIR / \"boundary_vs_raster_area_comparison.csv\"",
+      "dw_monthly_path = DATA_PROC / \"dw_monthly.parquet\"",
+      "samples_annual_pq_path = DATA_PROC / \"samples_annual.parquet\"",
+      "samples_annual_csv_path = DATA_PROC / \"samples_annual.csv\"",
+      "\"boundary_file\": \"data/reference/matopiba_boundary.geojson\",",
+      "\"municipalities_file\": \"data/reference/matopiba_municipalities.csv\",",
+      "\"data/reference/matopiba_boundary.geojson\": sha256(boundary_path),",
+      "\"data/reference/matopiba_municipalities.csv\": sha256(muni_path),",
+      "\"data/reference/matopiba_states.geojson\": sha256(states_path),",
+      "\"data/processed/wall_to_wall_summary.csv\": sha256(w2w_path),",
+      "\"data/processed/wall_to_wall_summary_10m_AUDIT.csv\": sha256(w2w_audit_path),",
+      "\"tables/sampling_frame_10m.csv\": sha256(frame_path),",
+      "\"tables/sampling_quotas.csv\": sha256(quotas_path),",
+      "\"tables/slice_sampling_allocation_final.csv\": sha256(alloc_final_path),",
+      "\"tables/zero_inclusion_substrata_audit.csv\": sha256(zero_pi_audit_path),",
+      "\"tables/dw_annual_identity_diagnostic.csv\": sha256(dw_diag_path),",
+      "\"tables/boundary_vs_raster_area_comparison.csv\": sha256(boundary_vs_raster_path),",
+      "\"data/processed/master_sampling_points.csv\": sha256(master_path),",
+      "\"data/processed/dw_monthly.parquet\": sha256(dw_monthly_path),",
+      "\"data/processed/samples_annual.parquet\": sha256(samples_annual_pq_path),",
+      "\"data/processed/samples_annual.csv\": sha256(samples_annual_csv_path),"
+    ]
+  },
+  {
+    "path": "src/gee/11_extract_analytical_dataset.py",
+    "docstring": "11_extract_analytical_dataset.py — Extração Analítica dos 40k Pontos (Checkpoint 3D)\n==================================================================================\nExtrai para os 40.000 pontos congelados da Master Sample (root_seed=25):\n  1. Bandas Anuais Autoritativas extraídas do stack canônico fixo:\n     - 9 probabilidades anuais normalizadas (p_water..p_snow_and_ice)\n     - probability_sum_before_normalization_annual\n     - annual_class_index, annual_class, dw_crop\n     - n_valid_months (garantido >= 8)\n     - mb_crop, regime_code\n     - Exigência: 100.000% de paridade com o regime congelado da Master!\n  2. Série mensal Dynamic World 2025 (12 meses particionada em 4 trimestres):\n     - probabilidades das 9 classes normalizadas para meses válidos\n     - probability_sum_before_normalization\n     - n_raw_obs, n_valid_days, month_valid = (n_valid_days > 0 and prob_sum > 0)\n  3. MapBiomas Cobertura 2025 e série histórica 2017–2025:\n     - mapbiomas_class, mapbiomas_crop (18/21 = 0)\n     - mapbiomas_stability_eligible_2017_2025\n     - mapbiomas_stable_2017_2025\n  4. Distâncias métricas truncadas de borda (EPSG:5880, 250m):\n     - distance_edge_mb_m, distance_edge_dw_m, distance_edge_min_m\n  5. Métricas Teórico-Informacionais e Temporais em Python:\n     - entropy_annual = -sum(p_k * ln(p_k)) / ln(9) (autoritativo)\n     - entropy_temporal_mean = H(M), onde M é a média dos p_m mensais normalizados\n     - entropy_monthly_mean = mean(H(p_m))\n     - jsd_temporal = max(0, entropy_temporal_mean - entropy_monthly_mean)\n     - stability = mean(argmax(p_m) == annual_class)\n     - top1_class, top1_probability, top2_class, top2_probability, top2_margin, competitor_class\n\nGera:\n  - data/processed/dw_monthly.parquet (480.000 linhas, 15 colunas)\n  - data/processed/samples_annual.parquet (40.000 linhas, 51 colunas)\n  - data/processed/samples_annual.csv (40.000 linhas, 51 colunas)",
+    "imports": [
+      "__future__",
+      "json",
+      "math",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "ee",
+      "numpy",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "- data/processed/dw_monthly.parquet (480.000 linhas, 15 colunas)",
+      "- data/processed/samples_annual.parquet (40.000 linhas, 51 colunas)",
+      "- data/processed/samples_annual.csv (40.000 linhas, 51 colunas)",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "DW_MONTHLY_PARQUET = DATA_PROC / \"dw_monthly.parquet\"",
+      "SAMPLES_ANNUAL_PARQUET = DATA_PROC / \"samples_annual.parquet\"",
+      "SAMPLES_ANNUAL_CSV = DATA_PROC / \"samples_annual.csv\"",
+      "return {f.stem for f in EXTRACTION_DIR.glob(\"*.json\")}",
+      "p = EXTRACTION_DIR / f\"{slice_id}.json\"",
+      "final_file = EXTRACTION_DIR / f\"{slice_id}.json\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/12_audit_zero_pi_and_reallocate.py",
+    "docstring": "12_audit_zero_pi_and_reallocate.py — Auditoria de Pi=0 e Nova Alocação Operacional\n================================================================================\nAtende integralmente às Seções A e B da auditoria:\n  1. Identifica todas as subpopulações (state x regime x slice_id) com N_hs_exact > 0 e n_robust_hs == 0\n  2. Produz tables/zero_inclusion_substrata_audit.csv\n  3. Valida a diferença exata de 5.218,30 ha em relação à área total elegível\n  4. Implementa a nova regra de alocação operacional Hamilton com garantia n_robust_hs >= 1\n  5. Salva tables/slice_sampling_allocation_final.csv",
+    "imports": [
+      "__future__",
+      "math",
+      "pathlib",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "2. Produz tables/zero_inclusion_substrata_audit.csv",
+      "5. Salva tables/slice_sampling_allocation_final.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "SLICE_AUDIT_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "ZERO_PI_OUT = TABLES_DIR / \"zero_inclusion_substrata_audit.csv\"",
+      "FINAL_ALLOC_OUT = TABLES_DIR / \"slice_sampling_allocation_final.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/12_extract_harmonized_bilinear_monthly.py",
+    "docstring": "12_extract_harmonized_bilinear_monthly.py — Extração Mensal Harmonizada dos 40k Pontos\n======================================================================================\nExecuta a FASE 3 da Correção Crítica da Inconsistência Temporal:\n  1. Extrai as séries mensais dos 12 meses de Dynamic World 2025 para todos os\n     40.000 pontos da Master Sample utilizando o suporte espacial IDÊNTICO ao\n     raster anual canônico:\n       comp_m.resample(\"bilinear\").reproject(crs=mb_proj)\n  2. Utiliza chamada única consolidada de 12 meses por fatia (182 fatias espaciais),\n     reduzindo a sobrecarga de requisições ao GEE em 75% e operando em plena\n     conformidade com a cota não-comercial restrita.\n  3. Checkpoints atômicos e retomada automática por fatia em:\n       data/processed/extraction_slices_bilinear/{slice_id}.json\n  4. Validação rigorosa de cada fatia (contagem de pontos, integridade de bandas, SHA-256).\n  5. Montagem dos novos artefatos consolidados:\n       - data/processed/dw_monthly.parquet (480.000 linhas)\n       - data/processed/samples_annual.parquet (40.000 linhas atualizadas em S e JSD)\n       - data/processed/samples_annual.csv (40.000 linhas)\n  6. Preservação estrita dos arquivos legados como histórico:\n       - data/processed/legacy_raw_dw_monthly.parquet\n       - data/processed/legacy_raw_samples_annual.parquet",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "json",
+      "math",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "ee",
+      "numpy",
+      "pandas",
+      "scipy.spatial.distance",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "data/processed/extraction_slices_bilinear/{slice_id}.json",
+      "- data/processed/dw_monthly.parquet (480.000 linhas)",
+      "- data/processed/samples_annual.parquet (40.000 linhas atualizadas em S e JSD)",
+      "- data/processed/samples_annual.csv (40.000 linhas)",
+      "- data/processed/legacy_raw_dw_monthly.parquet",
+      "- data/processed/legacy_raw_samples_annual.parquet",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "DW_MONTHLY_PARQUET = DATA_PROC / \"dw_monthly.parquet\"",
+      "SAMPLES_ANNUAL_PARQUET = DATA_PROC / \"samples_annual.parquet\"",
+      "SAMPLES_ANNUAL_CSV = DATA_PROC / \"samples_annual.csv\"",
+      "out_path = SLICES_DIR / f\"{slice_id}.json\"",
+      "log(\"Iniciando compilação de dw_monthly.parquet e samples_annual.parquet...\")",
+      "p = SLICES_DIR / f\"{slice_id}.json\"",
+      "# Salvar dw_monthly.parquet",
+      "log(f\"dw_monthly.parquet:     {get_sha256(DW_MONTHLY_PARQUET)}\")",
+      "log(f\"samples_annual.parquet: {get_sha256(SAMPLES_ANNUAL_PARQUET)}\")",
+      "log(f\"samples_annual.csv:     {get_sha256(SAMPLES_ANNUAL_CSV)}\")"
+    ]
+  },
+  {
+    "path": "src/gee/13_diagnose_dw_annual_identity.py",
+    "docstring": "13_diagnose_dw_annual_identity.py — Diagnóstico Completo da Identidade do DW Anual\n==================================================================================\nAtende integralmente à Seção D:\n  - 100 pontos mismatch e 100 pontos match\n  - Extração com a geometria exata da fatia operacional (slice_geom)\n  - Comparação de todas as 8 dimensões exigidas\n  - Demonstração matemática da convergência e isolamento da causa da divergência\n  - Salva tables/dw_annual_identity_diagnostic.csv",
+    "imports": [
+      "__future__",
+      "json",
+      "pathlib",
+      "sys",
+      "ee",
+      "numpy",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "- Salva tables/dw_annual_identity_diagnostic.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "SAMPLES_ANNUAL_PARQUET = DATA_PROC / \"samples_annual.parquet\"",
+      "DW_MONTHLY_PARQUET = DATA_PROC / \"dw_monthly.parquet\"",
+      "OUT_DIAGNOSTIC_CSV = TABLES_DIR / \"dw_annual_identity_diagnostic.csv\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/14_regenerate_master_sample.py",
+    "docstring": "14_regenerate_master_sample.py — Regeneração da Master Sample com Cobertura Completa (100%)\n========================================================================================\nAtende integralmente à Seção C da auditoria:\n  1. Utiliza a nova alocação operacional tables/slice_sampling_allocation_final.csv (n_robust_hs >= 1)\n  2. Preserva rigorosamente as 16 cotas científicas state x regime (n_robust_h, n_main_h)\n  3. Amostragem estratificada sem reposição com root_seed = 25\n  4. Ranking determinístico SHA256 para main sample (20.000 pontos)\n  5. Extrai pixel_area_m2 exato de ee.Image.pixelArea().reproject(crs=mb_proj)\n  6. Calcula probabilidades de inclusão e pesos exatos (Patch A):\n     - area_weight_robust = pixel_area_m2 / selection_probability_robust\n     - area_weight_main = pixel_area_m2 / selection_probability_main (se main_sample == 1)\n  7. Mecanismo seguro de checkpoint/resume idempotente para fatias e pixel_area_m2\n  8. Valida 100% de cobertura (zero pi = 0) e representação do frame completo\n  9. Salva data/processed/master_sampling_points.csv",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "json",
+      "math",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "requests",
+      "ee",
+      "numpy",
+      "pandas",
+      "shapely.geometry",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "1. Utiliza a nova alocação operacional tables/slice_sampling_allocation_final.csv (n_robust_hs >= 1)",
+      "9. Salva data/processed/master_sampling_points.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "ALLOC_FINAL_CSV = TABLES_DIR / \"slice_sampling_allocation_final.csv\"",
+      "CHECKPOINT_POINTS = DATA_PROC / \"master_sample_canonical_checkpoint.json\"",
+      "CHECKPOINT_PIXEL_AREA = DATA_PROC / \"pixel_area_m2_canonical_checkpoint.json\"",
+      "OUT_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "SLICE_DESIGN_CSV = TABLES_DIR / \"slice_sampling_design_audit.csv\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "# Atualizar slice_sampling_design_audit.csv"
+    ]
+  },
+  {
+    "path": "src/gee/15_qa_checkpoint_3b.py",
+    "docstring": "15_qa_checkpoint_3b.py — Bateria Completa de Validação e QA (Checkpoint 3B)\n===========================================================================\nExecuta todos os 19 testes obrigatórios da Seção J e gera estatísticas completas.",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "pathlib",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "DW_MONTHLY_PARQUET = DATA_PROC / \"dw_monthly.parquet\"",
+      "SAMPLES_ANNUAL_PARQUET = DATA_PROC / \"samples_annual.parquet\"",
+      "SAMPLES_ANNUAL_CSV = DATA_PROC / \"samples_annual.csv\"",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "ALLOC_FINAL_CSV = TABLES_DIR / \"slice_sampling_allocation_final.csv\"",
+      "FRAME_10M_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "BASE_DIR / \"data\" / \"reference\" / \"matopiba_boundary.geojson\",",
+      "BASE_DIR / \"data\" / \"reference\" / \"matopiba_municipalities.csv\",",
+      "TABLES_DIR / \"sampling_frame_10m.csv\",",
+      "TABLES_DIR / \"sampling_quotas.csv\",",
+      "TABLES_DIR / \"slice_sampling_allocation_final.csv\",",
+      "TABLES_DIR / \"zero_inclusion_substrata_audit.csv\",",
+      "TABLES_DIR / \"dw_annual_identity_diagnostic.csv\",",
+      "DATA_PROC / \"master_sampling_points.csv\",",
+      "DATA_PROC / \"dw_monthly.parquet\",",
+      "DATA_PROC / \"samples_annual.parquet\",",
+      "DATA_PROC / \"samples_annual.csv\","
+    ]
+  },
+  {
+    "path": "src/gee/16_dw_partition_invariance_audit.py",
+    "docstring": "16_dw_partition_invariance_audit.py — Auditoria de Invariância à Partição Espacial (Checkpoint 3C)\n==================================================================================================\nAvalia se a estratégia computacional de particionamento em fatias (slices) introduz\nqualquer alteração nas probabilidades, classes ou distâncias de borda do Dynamic World.\n\nMetodologia (Seções 1 a 5 da diretiva):\n  1. Amostra de Teste (N = 1.000 pontos, seed = 25):\n     - 500 pontos situados a <= 300 m da fronteira da slice\n     - 500 pontos distribuídos pelo MATOPIBA\n  2. Comparação dos Quatro Contextos Espaciais:\n     - Contexto A: slice_geom original\n     - Contexto B: slice_geom com buffer de 0.05° (~5.5 km)\n     - Contexto C: state_geom (geometria completa do estado)\n     - Contexto D: matopiba_geom (domínio fixo MATOPIBA)\n  3. Variáveis Avaliadas:\n     - 9 probabilidades anuais normalizadas (water..snow_and_ice)\n     - probability_sum_before_normalization\n     - n_valid_months\n     - annual_class_index, dw_crop\n     - distance_edge_dw_m (EPSG:5880, 250m)\n  4. Processamento Concorrente com Checkpointing e Batches de 50 pontos para evitar timeout.\n  5. Salva: tables/dw_partition_invariance_audit.csv",
+    "imports": [
+      "__future__",
+      "json",
+      "math",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "requests",
+      "ee",
+      "numpy",
+      "pandas",
+      "pyproj",
+      "shapely.geometry",
+      "shapely.ops",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "5. Salva: tables/dw_partition_invariance_audit.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\"",
+      "BOUNDARY_GEOJSON = DATA_REF / \"matopiba_boundary.geojson\"",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "OUT_AUDIT_CSV = TABLES_DIR / \"dw_partition_invariance_audit.csv\"",
+      "CHECKPOINT_INVARIANCE = DATA_PROC / \"partition_invariance_checkpoint.json\"",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/17_test_domain_convergence.py",
+    "docstring": "17_test_domain_convergence.py — Teste de Convergência do Domínio de Suporte Fixo\n==============================================================================\nAvalia a convergência entre domínios de suporte com diferentes buffers ao redor\ndo MATOPIBA nos 1.000 pontos de auditoria do Checkpoint 3C:\n\n  E1 = MATOPIBA + 1 km  (1.000 m)\n  E2 = MATOPIBA + 5 km  (5.000 m)\n  E3 = MATOPIBA + 10 km (10.000 m)\n\nVariáveis comparadas para cada ponto:\n  - 9 probabilidades anuais normalizadas (water..snow_and_ice)\n  - annual_class_index, dw_crop\n  - n_valid_months\n  - distance_edge_dw_m (EPSG:5880, 250m clamp)\n  - distance_edge_mb_m (EPSG:5880, 250m clamp)\n\nArquitetura Canônica & Resiliência:\n  O raster é definido de forma FIXA no domínio de suporte (E1, E2, E3).\n  As slices são utilizadas SOMENTE para paginação espacial.\n  Inclui fallback automático para amostragem particionada caso slices complexas\n  na fronteira atinjam o limite de memória em modo restrito.",
+    "imports": [
+      "__future__",
+      "json",
+      "os",
+      "socket",
+      "sys",
+      "threading",
+      "time",
+      "concurrent.futures",
+      "datetime",
+      "pathlib",
+      "typing",
+      "requests",
+      "ee",
+      "numpy",
+      "pandas",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "AUDIT_CSV_PREV = TABLES_DIR / \"dw_partition_invariance_audit.csv\"",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points_SLICE_DEPENDENT_INVALID.csv\"",
+      "CHECKPOINT_JSON = DATA_PROC / \"domain_convergence_checkpoint.json\"",
+      "OUT_AUDIT_CSV = TABLES_DIR / \"domain_convergence_audit.csv\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "(\"E1\", \"matopiba_support_1km.geojson\", \"1 km\"),",
+      "(\"E2\", \"matopiba_support_5km.geojson\", \"5 km\"),",
+      "(\"E3\", \"matopiba_support_10km.geojson\", \"10 km\"),"
+    ]
+  },
+  {
+    "path": "src/gee/18_export_canonical_wall_to_wall.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "pathlib",
+      "ee",
+      "src.gee.dw_annual",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "from src.gee.dw_annual import PROJECT_ID, get_harmonized_crosswalk_layers, get_mapbiomas_projection",
+      "ee.Initialize(project=PROJECT_ID)",
+      "with open('data/reference/matopiba_states.geojson', 'r') as f:"
+    ]
+  },
+  {
+    "path": "src/gee/19_process_canonical_wall_to_wall.py",
+    "docstring": "19_process_canonical_wall_to_wall.py — Post-Processing of Canonical 10m Census\n=============================================================================\nThis script executes immediately after the Earth Engine export task finishes:\n  1. Downloads 'canonical_wall_to_wall_10m.csv' from Google Drive (matopiba_exports folder)\n  2. Aggregates pixel counts and ellipsoidal areas (ha) across all 182 slices\n  3. Produces data/processed/wall_to_wall_summary.csv (MATOPIBA + 4 States)\n     - Validates closure: Total = Eligible + Excluded + Insufficient Temporal\n     - Validates closure: Eligible = AA + AN + NA + NN\n     - Computes Agreement, Disagreement, Quantity Disagreement, Allocation Disagreement\n  4. Produces tables/sampling_frame_10m.csv (16 state x regime strata, N_h_exact and A_h)\n  5. Computes sampling quotas via Hamilton method (floor=400, N_main=20k, N_robust=40k)\n     - Produces tables/sampling_quotas.csv\n     - Compares old (slice-dependent) vs new (fixed-domain canonical) quotas\n  6. Computes operational slice allocation with n_robust_hs >= 1 for all active subestratos\n     - Produces tables/slice_sampling_allocation_final.csv\n     - Formally verifies pi_robust_hs > 0 for 100% of the eligible population",
+    "imports": [
+      "__future__",
+      "io",
+      "json",
+      "math",
+      "pathlib",
+      "ee.oauth",
+      "google.oauth2.credentials",
+      "googleapiclient.discovery",
+      "googleapiclient.http",
+      "pandas"
+    ],
+    "io_lines": [
+      "1. Downloads 'canonical_wall_to_wall_10m.csv' from Google Drive (matopiba_exports folder)",
+      "3. Produces data/processed/wall_to_wall_summary.csv (MATOPIBA + 4 States)",
+      "4. Produces tables/sampling_frame_10m.csv (16 state x regime strata, N_h_exact and A_h)",
+      "- Produces tables/sampling_quotas.csv",
+      "- Produces tables/slice_sampling_allocation_final.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "EXPORT_CSV_LOCAL = DATA_PROC / \"canonical_wall_to_wall_10m_raw.csv\"",
+      "SUMMARY_CSV = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "FRAME_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "FINAL_ALLOC_CSV = TABLES_DIR / \"slice_sampling_allocation_final.csv\"",
+      "OLD_W2W_CSV = DATA_PROC / \"wall_to_wall_summary_SLICE_DEPENDENT_INVALID.csv\"",
+      "OLD_QUOTAS_CSV = TABLES_DIR / \"sampling_quotas_SLICE_DEPENDENT_INVALID.csv\"",
+      "ckpt_path = DATA_PROC / \"canonical_wall_to_wall_slices_checkpoint.json\"",
+      "# 1. Build sampling_frame_10m.csv with all active subestratos",
+      "# 2. Build wall_to_wall_summary.csv"
+    ]
+  },
+  {
+    "path": "src/gee/20_test_pagination_invariance.py",
+    "docstring": "20_test_pagination_invariance.py — Final Invariance Test of Spatial Pagination (Step 13)\n========================================================================================\nTests whether client/server pagination (chunking by slice vs by state vs all points together)\naffects analytical extraction on the frozen CANONICAL RASTER.\n\nRequirements:\n  - 1,000 deterministic sample points from the new Master Sample\n  - Extract the SAME canonical raster using 3 pagination modes:\n      Mode A: Per slice (points chunked by operational slice)\n      Mode B: Per state (points chunked by federal state)\n      Mode C: Biome-wide (all 1,000 points in a single evaluation)\n  - Assertions:\n      annual_class mismatch = 0\n      dw_crop mismatch = 0\n      n_valid_months mismatch = 0\n      probability difference <= 1e-4 (numerical precision)\n      distance_edge_dw difference <= 0.1 m\n      distance_edge_mb difference <= 0.1 m\n\nOutput:\n  - tables/pagination_invariance_audit.csv",
+    "imports": [
+      "__future__",
+      "concurrent.futures",
+      "json",
+      "time",
+      "pathlib",
+      "ee",
+      "numpy",
+      "pandas",
+      "sys",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "- tables/pagination_invariance_audit.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "MASTER_POINTS_CSV = DATA_PROC / \"master_sampling_points.csv\"",
+      "OUT_CSV = TABLES_DIR / \"pagination_invariance_audit.csv\"",
+      "PROJECT_ID,",
+      "ee.Initialize(project=PROJECT_ID)"
+    ]
+  },
+  {
+    "path": "src/gee/21_validate_checkpoint_3d_suite.py",
+    "docstring": "21_validate_checkpoint_3d_suite.py — Validação Integral e Hashing da Suíte Checkpoint 3D\n========================================================================================\nValida com rigor científico todos os 10 artefatos da suíte Checkpoint 3D:\n  1. data/processed/canonical_wall_to_wall_by_slice.csv\n  2. data/processed/wall_to_wall_summary.csv\n  3. tables/sampling_frame_10m.csv\n  4. tables/sampling_quotas.csv\n  5. tables/slice_sampling_allocation_final.csv\n  6. data/processed/master_sampling_points.csv\n  7. tables/pagination_invariance_audit.csv\n  8. data/processed/dw_monthly.parquet\n  9. data/processed/samples_annual.parquet\n 10. data/processed/samples_annual.csv\n\nGera hashes SHA-256 em tables/checkpoint_3d_checksums.sha256.",
+    "imports": [
+      "__future__",
+      "hashlib",
+      "sys",
+      "pathlib",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "1. data/processed/canonical_wall_to_wall_by_slice.csv",
+      "2. data/processed/wall_to_wall_summary.csv",
+      "3. tables/sampling_frame_10m.csv",
+      "4. tables/sampling_quotas.csv",
+      "5. tables/slice_sampling_allocation_final.csv",
+      "6. data/processed/master_sampling_points.csv",
+      "7. tables/pagination_invariance_audit.csv",
+      "8. data/processed/dw_monthly.parquet",
+      "9. data/processed/samples_annual.parquet",
+      "10. data/processed/samples_annual.csv",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "\"D1_wall_to_wall_slices\": DATA_PROC / \"canonical_wall_to_wall_by_slice.csv\",",
+      "\"D2_wall_to_wall_summary\": DATA_PROC / \"wall_to_wall_summary.csv\",",
+      "\"D3_sampling_frame\": TABLES_DIR / \"sampling_frame_10m.csv\",",
+      "\"D4_sampling_quotas\": TABLES_DIR / \"sampling_quotas.csv\",",
+      "\"D5_sampling_allocation\": TABLES_DIR / \"slice_sampling_allocation_final.csv\",",
+      "\"D6_master_points\": DATA_PROC / \"master_sampling_points.csv\",",
+      "\"D7_invariance_audit\": TABLES_DIR / \"pagination_invariance_audit.csv\",",
+      "\"D8_dw_monthly\": DATA_PROC / \"dw_monthly.parquet\",",
+      "\"D9_samples_annual_parquet\": DATA_PROC / \"samples_annual.parquet\",",
+      "\"D10_samples_annual_csv\": DATA_PROC / \"samples_annual.csv\","
+    ]
+  },
+  {
+    "path": "src/gee/audit_downloaded_batches.py",
+    "docstring": "Audit downloaded CSV schemas, rows, slices, and match against manifest.",
+    "imports": [
+      "os",
+      "glob",
+      "pandas"
+    ],
+    "io_lines": [
+      "manifest = pd.read_csv('tables/canonical_w2w_batch_manifest.csv')",
+      "csv_files = sorted(glob.glob(os.path.join(batch_dir, 'canonical_w2w_batch_*_10m.csv')))"
+    ]
+  },
+  {
+    "path": "src/gee/check_batch_states.py",
+    "docstring": "Direct GEE task status audit and reconciliation.",
+    "imports": [
+      "ee",
+      "os",
+      "pandas"
+    ],
+    "io_lines": [
+      "PROJECT_ID = 'dynamicworld-x-mapbiomas'",
+      "ee.Initialize(project=PROJECT_ID)",
+      "manifest = pd.read_csv('tables/canonical_w2w_batch_manifest.csv')",
+      "tasks_df = pd.read_csv('tables/canonical_w2w_batch_tasks.csv')",
+      "csv_name = f\"{b_id}_10m.csv\"",
+      "op = ee.data.getOperation(f\"projects/{PROJECT_ID}/operations/{t_id}\")"
+    ]
+  },
+  {
+    "path": "src/gee/check_drive.py",
+    "docstring": null,
+    "imports": [
+      "io",
+      "json",
+      "pathlib",
+      "ee.oauth",
+      "google.oauth2.credentials",
+      "googleapiclient.discovery",
+      "googleapiclient.http"
+    ],
+    "io_lines": [
+      "def find_file(drive_service, filename=\"canonical_wall_to_wall_10m.csv\"):",
+      "files = find_file(service, \"canonical_wall_to_wall_10m.csv\")",
+      "dest = Path(\"data/processed/canonical_wall_to_wall_10m.csv\")",
+      "print(\"File 'canonical_wall_to_wall_10m.csv' not found yet on Drive.\")"
+    ]
+  },
+  {
+    "path": "src/gee/check_drive_list.py",
+    "docstring": null,
+    "imports": [
+      "ee",
+      "ee.oauth",
+      "google.oauth2.credentials",
+      "googleapiclient.discovery"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/check_ma_crop_extent.py",
+    "docstring": null,
+    "imports": [
+      "ee",
+      "json"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/check_status_forensic.py",
+    "docstring": null,
+    "imports": [
+      "ee",
+      "pandas",
+      "pathlib",
+      "datetime"
+    ],
+    "io_lines": [
+      "tasks_df = pd.read_csv('tables/canonical_w2w_batch_tasks.csv')",
+      "manifest_df = pd.read_csv('tables/canonical_w2w_batch_manifest.csv')",
+      "csv_file = Path('data/processed/batches') / f'{b_id}_10m.csv'",
+      "batches_dir = Path('data/processed/batches')",
+      "for f in sorted(batches_dir.glob('*.csv')):"
+    ]
+  },
+  {
+    "path": "src/gee/create_batch_manifest.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "hashlib",
+      "pathlib",
+      "pandas",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "DATA_REF = Path(\"data/reference\")",
+      "TABLES_DIR = Path(\"tables\")",
+      "with open(DATA_REF / \"matopiba_states.geojson\", \"r\", encoding=\"utf-8\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/diagnose_probability_sums.py",
+    "docstring": "diagnose_probability_sums.py — Diagnóstico minucioso da soma das 9 probabilidades\n=================================================================================\nAudita separadamente nos mesmos pontos amostrais:\nA. observação Dynamic World original;\nB. composição diária;\nC. composição mensal antes de reprojeção;\nD. vetor anual antes de reprojeção;\nE. vetor anual após harmonização à grade MapBiomas 10 m;\nF. vetor após extração nos pontos.\n\nPara cada estágio, calcula e reporta:\nmin, Q1, median, mean, Q3, max, max(abs(sum_p - 1))",
+    "imports": [
+      "__future__",
+      "json",
+      "pathlib",
+      "ee",
+      "numpy",
+      "pandas"
+    ],
+    "io_lines": [
+      "csv_path = Path(\"data/processed/prototype_samples.csv\")"
+    ]
+  },
+  {
+    "path": "src/gee/dw_annual.py",
+    "docstring": "Dynamic World x MapBiomas — Authoritative Annual Dynamic World 2025 Module\n========================================================================\nSingle authoritative implementation for Dynamic World annual 2025 aggregation\nand harmonized MapBiomas crosswalk.\n\nAll subsequent scripts (wall-to-wall, sampling, extraction, auditing) MUST\nimport and reuse this module.\n\nCore Scientific Design (Checkpoint 3D Canonical Architecture):\n  1. Fixed Source Support Domain:\n     - SOURCE_SUPPORT_DOMAIN = MATOPIBA + 5,000 m buffer\n     - ImageCollection filtering, temporal compositing, resampling, and edge\n       detection are evaluated ONCE on this canonical support domain.\n     - Operational geometries (slices, state boundaries) are STRICTLY prohibited\n       as scientific source filtering bounds. Slices serve COMPUTATIONAL PURPOSES\n       ONLY (reduceRegion, sample, pagination, memory control).\n  2. Temporal Aggregation:\n     - Filter date: [2025-01-01, 2026-01-01)\n     - Distinct date: neutral mean of images on same day\n     - Distinct month: mean of valid days of that month\n     - Month valid indicator: unmasked observation count > 0\n     - Annual vector: equal-weighted mean ONLY among valid months\n  3. Resampling & Normalization:\n     - Continuous 9 probabilities aligned to grid10 (MapBiomas 10m) using bilinear resampling\n     - Probability sum before normalization preserved\n     - Normalization: p'_k = p_k / sum(p)\n     - Annual class: argmax of 9 normalized probabilities (crops is index 4)\n  4. Harmonized Crosswalk & Regimes:\n     - MapBiomas 2025: Crop = [19, 36], Excluded = [18, 21], Noncrop = all other valid\n     - Temporal eligibility: n_valid_months >= 8\n     - Regimes on eligible domain: AA (1), AN (2), NA (3), NN (4)\n  5. Canonical Edge Distances:\n     - distance_edge_mb_m: crop vs noncrop in fixed support domain (EPSG:5880, 250m clamp)\n     - distance_edge_dw_m: annual_class crop vs noncrop in fixed support domain (EPSG:5880, 250m clamp)\n     - distance_edge_min_m = min(distance_edge_mb_m, distance_edge_dw_m)",
+    "imports": [
+      "__future__",
+      "json",
+      "pathlib",
+      "typing",
+      "ee"
+    ],
+    "io_lines": [
+      "PROJECT_ID = \"dynamicworld-x-mapbiomas\"",
+      "SUPPORT_GEOJSON_PATH = Path(__file__).resolve().parent.parent.parent / \"data\" / \"reference\" / \"matopiba_support_5km.geojson\"",
+      "DATES_CACHE_PATH = Path(__file__).resolve().parent.parent.parent / \"data\" / \"reference\" / \"dw_2025_monthly_dates.json\""
+    ]
+  },
+  {
+    "path": "src/gee/extract_export_script.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "pathlib"
+    ],
+    "io_lines": [
+      "target = Path(\"src/gee/18_export_canonical_wall_to_wall.py\")"
+    ]
+  },
+  {
+    "path": "src/gee/generate_batch_manifest.py",
+    "docstring": null,
+    "imports": [
+      "hashlib",
+      "json",
+      "pathlib",
+      "pandas",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "MANIFEST_CSV = TABLES_DIR / \"canonical_w2w_batch_manifest.csv\"",
+      "with open(DATA_REF / \"matopiba_states.geojson\", \"r\", encoding=\"utf-8\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/monitor_and_process_batches.py",
+    "docstring": "monitor_and_process_batches.py — Monitora e processa os 10 batches de exportação W2W\n=====================================================================================\nExecuta:\n  1. Consulta de status no GEE para os 10 batches registrados em tables/canonical_w2w_batch_tasks.csv.\n  2. Atualização dos campos de estado, tempos e erros em tables/canonical_w2w_batch_tasks.csv.\n  3. Verificação e download automático de cada CSV concluído do Google Drive (pasta matopiba_exports).\n  4. Quando TODOS os 10 batches forem concluídos e baixados:\n     - Concatena todos os registros em data/processed/canonical_wall_to_wall_by_slice.csv.\n     - Valida: 182 linhas, 182 slices únicos, 0 duplicatas, 0 missing vs manifesto.\n     - Executa o fechamento de área e métricas de Pontius & Millones (2011).\n     - Atualiza data/processed/wall_to_wall_summary.csv (MATOPIBA + 4 estados).\n     - Atualiza tables/sampling_frame_10m.csv.\n     - Recalcula cotas científicas (tables/sampling_quotas.csv) e compara com antigas.\n     - Gera nova alocação operacional (tables/slice_sampling_allocation_final.csv) garantindo pi > 0.",
+    "imports": [
+      "__future__",
+      "io",
+      "math",
+      "datetime",
+      "pathlib",
+      "pandas",
+      "sys",
+      "ee",
+      "ee.oauth",
+      "google.oauth2.credentials",
+      "googleapiclient.discovery",
+      "googleapiclient.http",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "1. Consulta de status no GEE para os 10 batches registrados em tables/canonical_w2w_batch_tasks.csv.",
+      "2. Atualização dos campos de estado, tempos e erros em tables/canonical_w2w_batch_tasks.csv.",
+      "- Concatena todos os registros em data/processed/canonical_wall_to_wall_by_slice.csv.",
+      "- Atualiza data/processed/wall_to_wall_summary.csv (MATOPIBA + 4 estados).",
+      "- Atualiza tables/sampling_frame_10m.csv.",
+      "- Recalcula cotas científicas (tables/sampling_quotas.csv) e compara com antigas.",
+      "- Gera nova alocação operacional (tables/slice_sampling_allocation_final.csv) garantindo pi > 0.",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "MANIFEST_CSV = TABLES_DIR / \"canonical_w2w_batch_manifest.csv\"",
+      "TASKS_CSV = TABLES_DIR / \"canonical_w2w_batch_tasks.csv\"",
+      "BY_SLICE_CSV = DATA_PROC / \"canonical_wall_to_wall_by_slice.csv\"",
+      "SUMMARY_CSV = DATA_PROC / \"wall_to_wall_summary.csv\"",
+      "FRAME_CSV = TABLES_DIR / \"sampling_frame_10m.csv\"",
+      "QUOTAS_CSV = TABLES_DIR / \"sampling_quotas.csv\"",
+      "FINAL_ALLOC_CSV = TABLES_DIR / \"slice_sampling_allocation_final.csv\"",
+      "OLD_W2W_CSV = DATA_PROC / \"wall_to_wall_summary_SLICE_DEPENDENT_INVALID.csv\"",
+      "OLD_QUOTAS_CSV = TABLES_DIR / \"sampling_quotas_SLICE_DEPENDENT_INVALID.csv\"",
+      "from src.gee.dw_annual import PROJECT_ID",
+      "expected_name = f\"{b_id}_10m.csv\"",
+      "ee.Initialize(project=PROJECT_ID)",
+      "op = ee.data.getOperation(f\"projects/{PROJECT_ID}/operations/{t_id}\")",
+      "p = BATCHES_DIR / f\"{b_id}_10m.csv\"",
+      "# 6. Reconstruir tables/sampling_frame_10m.csv (Seção 9)"
+    ]
+  },
+  {
+    "path": "src/gee/split_batch_08a.py",
+    "docstring": "Deterministic split of failed batch 08a into 08a1 and 08a2.",
+    "imports": [
+      "pandas"
+    ],
+    "io_lines": [
+      "manifest_path = 'tables/canonical_w2w_batch_manifest.csv'",
+      "print(\"Updated tables/canonical_w2w_batch_manifest.csv successfully.\")"
+    ]
+  },
+  {
+    "path": "src/gee/split_batch_08a1.py",
+    "docstring": "split_batch_08a1.py — Deterministic split of failed batch 08a1 into 08a1a and 08a1b\n====================================================================================\nRule 5:\nSE FAILED:\nleia o error_message completo.\nSe o erro for:\nComputation timed out.\ndivida SOMENTE aquele batch ao meio de forma determinística,\nmantendo as mesmas slices e o mesmo raster canônico.",
+    "imports": [
+      "pathlib",
+      "pandas"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "MANIFEST_CSV = BASE_DIR / \"tables\" / \"canonical_w2w_batch_manifest.csv\"",
+      "print(\"Updated tables/canonical_w2w_batch_manifest.csv successfully.\")"
+    ]
+  },
+  {
+    "path": "src/gee/split_batch_08b.py",
+    "docstring": "Deterministic split of failed batch 08b into 08b1 and 08b2.",
+    "imports": [
+      "pandas"
+    ],
+    "io_lines": [
+      "manifest_path = 'tables/canonical_w2w_batch_manifest.csv'",
+      "print(\"Updated tables/canonical_w2w_batch_manifest.csv successfully.\")"
+    ]
+  },
+  {
+    "path": "src/gee/split_manifest_batches.py",
+    "docstring": "Deterministic split of failed batches (06, 07, 08, 09) into a/b sub-batches.",
+    "imports": [
+      "pandas"
+    ],
+    "io_lines": [
+      "manifest_path = 'tables/canonical_w2w_batch_manifest.csv'",
+      "print(\"Updated tables/canonical_w2w_batch_manifest.csv successfully.\")"
+    ]
+  },
+  {
+    "path": "src/gee/submit_canonical_batch_exports.py",
+    "docstring": "submit_canonical_batch_exports.py — Submete 10 batches de exportação do censo canônico 10m\n========================================================================================\nAtende integralmente às seções 1–5 da instrução:\n  1. Carrega o manifesto tables/canonical_w2w_batch_manifest.csv (182 slices balanceadas em 10 lotes).\n  2. Constrói o RASTER CANÔNICO FIXO UMA VEZ no domínio de suporte MATOPIBA + 5.000 m.\n  3. Prepara as 42 bandas canônicas (16 bandas centrais + 26 bandas de meses m_0..m_12).\n  4. Para cada batch_id (canonical_w2w_batch_00..canonical_w2w_batch_09):\n     - Seleciona as geometrias das slices pertencentes ao lote;\n     - Executa reduceRegions sobre a grade congelada MapBiomas 10m (crs, crsTransform, tileScale=16);\n     - Dispara ee.batch.Export.table.toDrive com prefixo '{batch_id}_10m';\n     - Registra os metadados da tarefa em tables/canonical_w2w_batch_tasks.csv.",
+    "imports": [
+      "__future__",
+      "json",
+      "sys",
+      "time",
+      "datetime",
+      "pathlib",
+      "pandas",
+      "shapely.geometry",
+      "ee",
+      "src.gee.dw_annual",
+      "argparse"
+    ],
+    "io_lines": [
+      "1. Carrega o manifesto tables/canonical_w2w_batch_manifest.csv (182 slices balanceadas em 10 lotes).",
+      "- Registra os metadados da tarefa em tables/canonical_w2w_batch_tasks.csv.",
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "PROJECT_ID,",
+      "MANIFEST_CSV = TABLES_DIR / \"canonical_w2w_batch_manifest.csv\"",
+      "TASKS_CSV = TABLES_DIR / \"canonical_w2w_batch_tasks.csv\"",
+      "with open(DATA_REF / \"matopiba_states.geojson\", \"r\", encoding=\"utf-8\") as f:",
+      "ee.Initialize(project=PROJECT_ID)",
+      "# 5. Salvar/Atualizar registro de tarefas em tables/canonical_w2w_batch_tasks.csv"
+    ]
+  },
+  {
+    "path": "src/gee/test_30m_aggregation.py",
+    "docstring": "test_30m_aggregation.py — Teste e demonstração da agregação real 10 m -> 30 m\n=============================================================================\nDemonstra que:\n1. A grade 30 m é derivada exatamente da grade 10 m (transformação 3 * dx, 3 * dy, mesma origem);\n2. Dynamic World 30 m usa reduceResolution(ee.Reducer.mean()) a partir do 10 m;\n3. MapBiomas 30 m usa majority/mode dos pixels válidos (sem bilinear em dados categóricos);\n4. O valor em 30 m representa a agregação real dos 9 suportes de 10 m.",
+    "imports": [
+      "__future__",
+      "ee"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_balsas_basin.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_balsas_crop_sample.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_both_extraction.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_crop_pool.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "shapely.geometry",
+      "collections"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_date_perf.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "ee",
+      "json"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\", \"r\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_edge_masking.py",
+    "docstring": "test_edge_masking.py — Teste de detecção de bordas com mascaramento de classes excluídas\n=======================================================================================\nVerifica que:\n1. Pixels excluídos (21 Mosaico, 18 Agricultura) são mascarados antes da detecção;\n2. Transições envolvendo classes excluídas NÃO disparam borda;\n3. Borda entre CROP (19, 36) e NONCROP válido é corretamente identificada;\n4. fastDistanceTransform opera diretamente sobre edge=1 (sem edge.Not()).",
+    "imports": [
+      "__future__",
+      "ee"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_export.py",
+    "docstring": null,
+    "imports": [
+      "ee"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_identity_proto.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "math",
+      "sys",
+      "time",
+      "pathlib",
+      "ee",
+      "pandas",
+      "numpy"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "CSV_PATH = BASE_DIR / \"data\" / \"processed\" / \"prototype_samples.csv\""
+    ]
+  },
+  {
+    "path": "src/gee/test_ma_candidates.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_ma_cropbox.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_ma_south_stratified.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "shapely.geometry",
+      "collections"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_ma_split.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "time",
+      "pathlib",
+      "ee",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\""
+    ]
+  },
+  {
+    "path": "src/gee/test_ma_tile.py",
+    "docstring": null,
+    "imports": [
+      "ee",
+      "json",
+      "time",
+      "pathlib"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "STATES_GEOJSON = DATA_REF / \"matopiba_states.geojson\""
+    ]
+  },
+  {
+    "path": "src/gee/test_mb_crop_filter.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee",
+      "collections",
+      "shapely.geometry"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_mb_sample_candidate.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_mb_stratified.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_pi_stratified.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_points_extraction_speed.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_sample_mechanics.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "ee"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_sample_points_speed.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "ee",
+      "json"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_single_stratum_sample.py",
+    "docstring": null,
+    "imports": [
+      "time",
+      "json",
+      "ee"
+    ],
+    "io_lines": [
+      "with open(\"data/reference/matopiba_states.geojson\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_slice_partition.py",
+    "docstring": null,
+    "imports": [
+      "json",
+      "sys",
+      "time",
+      "pathlib",
+      "shapely.geometry",
+      "ee",
+      "src.gee.dw_annual"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "with open(\"data/reference/matopiba_states.geojson\", \"r\") as f:"
+    ]
+  },
+  {
+    "path": "src/gee/test_synthetic_distance.py",
+    "docstring": "test_synthetic_distance.py — Teste sintético numérico de fastDistanceTransform\n=============================================================================\nDemonstra numericamente:\n- pixel de borda -> distância 0 m;\n- pixel a 1 pixel da borda -> aproximadamente 10 m;\n- pixel a 2 pixels da borda -> aproximadamente 20 m;\n- pixel a 3 pixels da borda -> aproximadamente 30 m;\n- pixel a 5 pixels da borda -> aproximadamente 50 m;\n- valores distantes (>250m) -> truncados em 250 m.",
+    "imports": [
+      "__future__",
+      "ee"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_temporal_point_audit.py",
+    "docstring": "test_temporal_point_audit.py — Teste de contagem de observações unmasked por ponto e mês\n========================================================================================\nDemonstra:\n1. Contagem exata de observações unmasked (n_obs) por ponto para cada mês (m01 a m12);\n2. Validação de month_valid = (n_obs > 0);\n3. n_valid_months = sum(month_valid);\n4. Tabela de n_obs por mês e por estado;\n5. Composição rigorosa: mesmo dia -> média diária -> média mensal -> média anual com pesos iguais.",
+    "imports": [
+      "__future__",
+      "ee",
+      "pandas"
+    ],
+    "io_lines": []
+  },
+  {
+    "path": "src/gee/test_wall_to_wall.py",
+    "docstring": "test_wall_to_wall.py — Teste de cálculo wall-to-wall de áreas por estado",
+    "imports": [
+      "__future__",
+      "json",
+      "time",
+      "pathlib",
+      "ee"
+    ],
+    "io_lines": [
+      "BASE_DIR = Path(__file__).resolve().parent.parent.parent",
+      "STATES_GEOJSON = BASE_DIR / \"data\" / \"reference\" / \"matopiba_states.geojson\""
+    ]
+  }
+]

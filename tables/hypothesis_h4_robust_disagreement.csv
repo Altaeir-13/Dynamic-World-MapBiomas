@@ -1,0 +1,9 @@
+sample,filter,n_pts,weighted_pct_d1
+20k Principal,1. D=1,5143,100.0
+20k Principal,2. H <= Q1,985,21.258043983446807
+20k Principal,3. JSD <= Q1,884,18.536870005464863
+20k Principal,4. Estabilidade >= Q3,539,11.613731342513226
+20k Principal,5. Distancia >= 30m,4866,94.33222394591836
+20k Principal,H4 Completo (Todas 4),207,4.277295026419934
+40k Robusta,1. D=1,10286,100.0
+40k Robusta,H4 Completo (Todas 4),404,4.168730108820655

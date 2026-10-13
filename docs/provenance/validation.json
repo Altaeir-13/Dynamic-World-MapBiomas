@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-13",
+  "scientific_manifest_verified": 33,
+  "all_original_data_tables_figures_paper_byte_preserved": true,
+  "original_configuration_byte_preserved": true,
+  "archive_members_verified_against_original_sha256": 196,
+  "credential_scan_suspects": [],
+  "largest_public_file_bytes": 34847652,
+  "public_files_before_report_completion": 153,
+  "public_logical_bytes_before_report_completion": 125099036,
+  "clean_dependency_install": true,
+  "pip_check": "No broken requirements found",
+  "experimental_rerun": false,
+  "gee_rerun": false,
+  "local_deletion_executed": false,
+  "offline_data_validation": {
+    "tables/manuscript_results_manifest.csv": {
+      "verified": 33
+    },
+    "docs/provenance/release_checksums.csv": {
+      "verified": 150
+    },
+    "python_syntax": 20,
+    "development_sources.zip": "CRC OK",
+    "editorial_provenance.zip": "CRC OK",
+    "historical_evidence.zip": "CRC OK",
+    "data": {
+      "annual_rows": 40000,
+      "monthly_rows": 480000,
+      "main_rows": 20000,
+      "municipalities": 337
+    }
+  },
+  "document_validation": {
+    "pages": 5,
+    "title_metadata_matches_final_markdown": true,
+    "frozen_vs_fresh_docx_export_text_equal_ignoring_whitespace": true,
+    "visual_inspection_all_five_pages": "passed",
+    "frozen_pdf_modified": false
+  }
+}
